@@ -2,6 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 
+
+// Route ke halaman Home Pengunjung
 Route::get('/', function () {
-    return view('welcome');
+    // Artinya: Buka file "home" yang ada di dalam folder "pengunjung"
+    return view('pengunjung.home');
+});
+
+Route::get('/login', function () {
+    // Artinya: Buka file "home" yang ada di dalam folder "pengunjung"
+    return view('pengunjung.login');
+});
+
+Route::get('/register', function () {
+    // Artinya: Buka file "register" yang ada di dalam folder "pengunjung"
+    return view('pengunjung.register');
 });
