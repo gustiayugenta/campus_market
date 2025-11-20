@@ -1,11 +1,45 @@
-@import 'tailwindcss';
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@layer base {
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #FFF5F5;
+        color: #333;
+    }
+}
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+@layer components {
+    .btn-primary {
+        background-color: #FF9894;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        box-shadow: 0 4px 15px rgba(255, 152, 148, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #FF7E7A;
+        transform: translateY(-2px);
+    }
+
+    .glass-card {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 1rem;
+        padding: 1rem;
+    }
+
+    .hero-pattern {
+        background-color: #FF9894;
+        color: white;
+        border-radius: 1rem;
+        box-shadow: 0 4px 15px rgba(255, 152, 148, 0.4);
+        padding: 2rem;
+    }
 }
