@@ -9,12 +9,12 @@ Route::get('/', function () {
     return view('pengunjung.home');
 });
 
-Route::get('/login', function () {
+Route::get('/login-seller', function () {
     // Artinya: Buka file "home" yang ada di dalam folder "pengunjung"
     return view('pengunjung.login');
 });
 
-Route::get('/register', function () {
+Route::get('/register-seller', function () {
     // Artinya: Buka file "register" yang ada di dalam folder "pengunjung"
     return view('pengunjung.register');
 });

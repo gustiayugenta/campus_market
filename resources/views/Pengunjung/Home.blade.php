@@ -3,15 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampusMarket - Jual Beli Mahasiswa</title>
+    <title>SiToko - Marketplace untuk Semua</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            500: '#FF9894', 
+                            600: '#FF7A7A', // Warna tombol utama disamakan
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
     <style type="text/tailwindcss">
         @layer utilities {
@@ -38,54 +57,35 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        /* Container Tokopedia Style: Max width 1200px dan centered */
         .tokped-container {
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
-            padding-left: 1rem; /* px-4 */
-            padding-right: 1rem; /* px-4 */
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
         
         @media (min-width: 768px) {
             .tokped-container {
-                padding-left: 1.5rem; /* px-6 */
+                padding-left: 1.5rem;
                 padding-right: 1.5rem;
             }
         }
     </style>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: {
-                            500: '#FF9894', 
-                            600: '#FF9894',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
 <body class="bg-gray-50 text-slate-800 font-sans antialiased selection:bg-pink-200 selection:text-pink-900 pb-20">
 
     {{-- DATA DUMMY --}}
     @php
         $categories = [
-            ['name' => 'Buku & Teks Pelajaran', 'icon' => 'fa-book', 'color' => 'bg-yellow-100 text-yellow-600'],
             ['name' => 'Elektronik & Gadget', 'icon' => 'fa-laptop', 'color' => 'bg-blue-100 text-blue-600'],
-            ['name' => 'Perlengkapan Kuliah', 'icon' => 'fa-pen-to-square', 'color' => 'bg-green-100 text-green-600'],
             ['name' => 'Pakaian & Aksesoris', 'icon' => 'fa-shirt', 'color' => 'bg-pink-100 text-pink-600'],
+            ['name' => 'Perabot Rumah & Dapur', 'icon' => 'fa-bed', 'color' => 'bg-emerald-100 text-emerald-600'],
+            ['name' => 'Buku & Media', 'icon' => 'fa-book', 'color' => 'bg-yellow-100 text-yellow-600'],
             ['name' => 'Makanan & Minuman', 'icon' => 'fa-utensils', 'color' => 'bg-orange-100 text-orange-600'],
-            ['name' => 'Perlengkapan Kos', 'icon' => 'fa-bed', 'color' => 'bg-emerald-100 text-emerald-600'],
-            ['name' => 'Transportasi & Aksesori', 'icon' => 'fa-bicycle', 'color' => 'bg-indigo-100 text-indigo-600'],
-            ['name' => 'Jasa & Les', 'icon' => 'fa-user-graduate', 'color' => 'bg-purple-100 text-purple-600'],
+            ['name' => 'Kendaraan & Aksesoris', 'icon' => 'fa-bicycle', 'color' => 'bg-indigo-100 text-indigo-600'],
+            ['name' => 'Kesehatan & Kecantikan', 'icon' => 'fa-heart', 'color' => 'bg-rose-100 text-rose-600'],
+            ['name' => 'Jasa & Layanan', 'icon' => 'fa-briefcase', 'color' => 'bg-purple-100 text-purple-600'],
         ];
 
         $products = [
@@ -109,18 +109,22 @@
                 <div class="bg-pink-50 p-2 rounded-lg group-hover:bg-pink-100 transition">
                     <i class="fa-solid fa-bag-shopping text-xl"></i>
                 </div>
-                <span class="font-bold text-xl tracking-tight hidden md:block">CampusMarket</span>
+                <span class="font-bold text-xl tracking-tight hidden md:block">SiToko</span>
             </a>
 
-            {{-- Search Bar Added to match "Marketplace Feel" --}}
             <div class="hidden md:flex flex-1 max-w-2xl relative">
-                <input type="text" placeholder="Cari barang di CampusMarket..." class="w-full border border-gray-300 rounded-lg py-2 px-4 pl-10 focus:outline-none focus:border-[#FF9894] focus:ring-1 focus:ring-[#FF9894] transition-all text-sm">
+                <input type="text" placeholder="Cari barang di SiToko..." class="w-full border border-gray-300 rounded-lg py-2 px-4 pl-10 focus:outline-none focus:border-[#FF9894] focus:ring-1 focus:ring-[#FF9894] transition-all text-sm">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-sm"></i>
             </div>
 
-            <div class="flex items-center gap-4 shrink-0">
-                <a href="/login" class="text-sm font-medium text-gray-700 hover:text-[#FF9894] transition">Masuk</a>
-                <a href="/register" class="bg-[#FF9894] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-pink-600 transition">Daftar</a>
+            <div class="flex items-center gap-3 shrink-0">
+                <a href="/login-seller" class="text-sm font-semibold text-gray-600 hover:text-[#FF7A7A] transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-store"></i> Masuk Toko
+                </a>
+                
+                <a href="/register-seller" class="bg-[#FF7A7A] text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-[#ff6363] hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Buka Toko
+                </a>
             </div>
         </div>
     </nav>
@@ -133,10 +137,10 @@
 
             <div class="relative z-10 max-w-2xl mx-auto">
                 <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight drop-shadow-md">
-                    Belanja Hemat <br> Sesama Mahasiswa
+                    Belanja Hemat <br> untuk Semua
                 </h1>
                 <p class="text-white/90 text-lg mb-8 font-medium">
-                    Marketplace khusus mahasiswa. Jual barang bekasmu, temukan kebutuhan kuliahmu.
+                    Marketplace untuk semua. Jual barang bekasmu, temukan kebutuhanmu.
                 </p>
                 
                 <div class="flex justify-center gap-3">
@@ -157,7 +161,6 @@
             <a href="#" class="text-[#FF9894] font-semibold text-sm hover:underline">Lihat Semua</a>
         </div>
         
-        {{-- Grid 5 kolom di Desktop, 10 kolom di Large Desktop agar mirip Tokped baris icon --}}
         <div class="grid grid-cols-5 md:grid-cols-10 gap-y-6 gap-x-2 animate-on-scroll bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
             @foreach($categories as $cat)
             <div class="group cursor-pointer flex flex-col items-center gap-2 transition hover:-translate-y-1">
@@ -170,7 +173,7 @@
         </div>
     </section>
 
-    {{-- PRODUK TERLARIS (GRID SYSTEM) --}}
+    {{-- PRODUK TERLARIS --}}
     <section class="tokped-container mt-8">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -179,7 +182,6 @@
             <a href="#" class="text-[#FF9894] font-semibold text-sm hover:underline">Lihat Semua</a>
         </div>
 
-        {{-- 2 Kolom (HP), 3 (Tablet), 5 (Desktop - Mirip Tokped) --}}
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             @foreach($products as $index => $item)
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-300 cursor-pointer group overflow-hidden animate-on-scroll flex flex-col h-full" style="animation-delay: {{ $index * 50 }}ms">
@@ -203,7 +205,6 @@
                         <p class="text-sm md:text-base font-bold text-slate-900">{{ $item['price'] }}</p>
                     </div>
 
-                    {{-- Info Bawah (Rating & Terjual) --}}
                     <div class="flex items-center gap-1 mt-auto text-[10px] text-gray-500">
                         <i class="fa-solid fa-star text-yellow-400"></i>
                         <span class="font-medium text-gray-600">{{ $item['rating'] }}</span>
@@ -228,51 +229,8 @@
     </section>
 
     {{-- FOOTER --}}
-    <footer class="bg-white border-t border-gray-200 mt-20 pt-12 pb-8">
-        <div class="tokped-container">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <div class="md:col-span-1">
-                    <div class="flex items-center gap-2 text-[#FF9894] mb-4">
-                        <i class="fa-solid fa-bag-shopping text-2xl"></i>
-                        <span class="font-bold text-xl">CampusMarket</span>
-                    </div>
-                    <p class="text-gray-500 text-sm leading-relaxed">
-                        Platform jual beli aman dan terpercaya khusus untuk mahasiswa di seluruh Indonesia.
-                    </p>
-                </div>
-                <div>
-                    <h5 class="font-bold text-gray-800 mb-4">Tentang Kami</h5>
-                    <ul class="space-y-2 text-sm text-gray-500">
-                        <li><a href="#" class="hover:text-pink-500 transition">Hak Kekayaan Intelektual</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">Karir</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">Blog</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h5 class="font-bold text-gray-800 mb-4">Bantuan</h5>
-                    <ul class="space-y-2 text-sm text-gray-500">
-                        <li><a href="#" class="hover:text-pink-500 transition">Pusat Bantuan</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">Syarat & Ketentuan</a></li>
-                        <li><a href="#" class="hover:text-pink-500 transition">Kebijakan Privasi</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h5 class="font-bold text-gray-800 mb-4">Ikuti Kami</h5>
-                    <div class="flex gap-3">
-                        <a href="#" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-pink-500 hover:text-white transition"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-pink-500 hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-pink-500 hover:text-white transition"><i class="fa-brands fa-twitter"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-gray-100 pt-8 text-center text-sm text-gray-400 font-medium">
-                &copy; 2025 CampusMarket. Dibuat dengan <i class="fa-solid fa-heart text-pink-400 mx-1"></i> oleh Mahasiswa.
-            </div>
-        </div>
     <x-footer />
-
-    {{-- include shared footer component --}}
-    {{-- (already replaced above, keep as include for maintainability) --}}
+    
     <button id="scrollToTop" class="fixed bottom-6 right-6 bg-pink-500 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center translate-y-20 opacity-0 transition-all duration-300 hover:bg-pink-600 hover:-translate-y-1 z-40">
         <i class="fa-solid fa-arrow-up"></i>
     </button>

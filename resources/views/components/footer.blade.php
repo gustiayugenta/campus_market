@@ -14,16 +14,16 @@
 	}
 </style>
 
-<footer class="bg-white border-t border-gray-200 mt-20 pt-16 pb-10">
+<footer class="bg-white border-t border-gray-200 mt-12 pt-16 pb-10">
 	<div class="tokped-container">
 		<div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
 			<div class="md:col-span-1">
 				<div class="flex items-center gap-2 text-[#FF9894] mb-4">
 					<i class="fa-solid fa-bag-shopping text-2xl"></i>
-					<span class="font-bold text-xl">CampusMarket</span>
+					<span class="font-bold text-xl">SiToko</span>
 				</div>
-				<p class="text-gray-500 text-sm leading-relaxed">
-					Platform jual beli aman dan terpercaya khusus untuk mahasiswa di seluruh Indonesia.
+					<p class="text-gray-500 text-sm leading-relaxed">
+						Platform jual beli aman dan terpercaya untuk semua di seluruh Indonesia.
 				</p>
 			</div>
 			<div>
@@ -51,8 +51,8 @@
 				</div>
 			</div>
 		</div>
-		<div class="border-t border-gray-100 pt-8 text-center text-sm text-gray-400 font-medium">
-			&copy; {{ date('Y') }} CampusMarket. Dibuat dengan <i class="fa-solid fa-heart text-pink-400 mx-1"></i> oleh Mahasiswa.
-		</div>
+			<div class="border-t border-gray-100 pt-8 text-center text-sm text-gray-400 font-medium">
+				&copy; {{ date('Y') }} SiToko. Dibuat dengan <i class="fa-solid fa-heart text-pink-400 mx-1"></i> oleh masyarakat umum.
+			</div>
 	</div>
 </footer>
