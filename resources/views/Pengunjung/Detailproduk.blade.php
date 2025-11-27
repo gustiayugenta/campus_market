@@ -34,7 +34,7 @@
         }
 
         /* Background Gradient */
-        .page-bg { background: linear-gradient(180deg, #FFF0F0 0%, #FFFFFF 30%); }
+            .page-bg { background: #FFEBEB; }
 
         /* Utilities */
         .text-primary { color: var(--primary); }
