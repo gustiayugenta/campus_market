@@ -152,7 +152,12 @@
             <h2 class="login-header">Selamat Datang Kembali!</h2>
             <p class="login-sub">Silakan masuk ke akun toko Anda</p>
             
-            <form id="sellerLoginForm">
+            @if($errors->any())
+                <div class="mb-4 p-3 rounded text-white" style="background:#ff7a7a">{{ $errors->first() }}</div>
+            @endif
+
+            <form id="sellerLoginForm" method="POST" action="{{ url('/login') }}">
+                @csrf
                 
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
@@ -160,7 +165,7 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                             <i class="fas fa-envelope"></i>
                         </span>
-                        <input type="email" class="form-input pl-10" placeholder="nama@email.com" required>
+                        <input type="email" name="email" class="form-input pl-10" placeholder="nama@email.com" value="{{ old('email') }}" required>
                     </div>
                 </div>
 
@@ -170,7 +175,7 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                             <i class="fas fa-lock"></i>
                         </span>
-                        <input type="password" id="password" class="form-input pl-10 pr-10" placeholder="Masukkan password" required>
+                        <input type="password" name="password" id="password" class="form-input pl-10 pr-10" placeholder="Masukkan password" required>
                         <span class="absolute inset-y-0 right-0 flex items-center px-3 cursor-pointer text-gray-500 hover:text-primary-600" onclick="togglePassword()">
                             <i class="fas fa-eye" id="icon-pass"></i>
                         </span>
@@ -183,7 +188,7 @@
                 
                 <button type="submit" class="btn-login" id="btn-submit">
                     <span class="loader" id="btn-loader"></span>
-                    <span id="btn-text">MASUK KE DASHBOARD</span>
+                    <span id="btn-text">MASUK</span>
                 </button>
             </form>
 
@@ -199,7 +204,7 @@
         <i class="fas fa-arrow-up"></i>
     </button>
     
-    <script>
+            <script>
         // 1. Toggle Password
         function togglePassword() {
             const input = document.getElementById('password');
@@ -213,29 +218,17 @@
             }
         }
 
-        // 2. Submit Handler (Simulation)
+        // 2. Submit Handler (show loader and allow normal POST submission)
         document.getElementById('sellerLoginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
             const btnSubmit = document.getElementById('btn-submit');
             const btnLoader = document.getElementById('btn-loader');
             const btnText = document.getElementById('btn-text');
-            const email = document.querySelector('input[type="email"]').value;
 
             // Loading UI
             btnSubmit.disabled = true;
             btnLoader.style.display = 'block';
             btnText.textContent = 'MEMPROSES...';
-
-            setTimeout(() => {
-                alert(`Login Berhasil!\nSelamat datang kembali di Dashboard Toko: ${email}`);
-                // Redirect logic would go here
-                // window.location.href = '/seller/dashboard';
-                
-                btnSubmit.disabled = false;
-                btnLoader.style.display = 'none';
-                btnText.textContent = 'MASUK KE DASHBOARD';
-            }, 1500);
+            // Form will submit normally; server will handle redirect.
         });
 
         // 3. Scroll Animations

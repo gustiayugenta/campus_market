@@ -178,7 +178,7 @@
         @else
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
                 @foreach(($products ?? []) as $index => $item)
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-300 cursor-pointer group overflow-hidden animate-on-scroll flex flex-col h-full" style="animation-delay: {{ $index * 50 }}ms">
+                <a href="{{ $item['url'] }}" class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-300 group overflow-hidden animate-on-scroll flex flex-col h-full no-underline text-inherit" style="animation-delay: {{ $index * 50 }}ms">
                     
                     <div class="relative aspect-square bg-gray-100 overflow-hidden">
                         <img src="{{ $item['img'] }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -211,7 +211,7 @@
                              <span class="truncate max-w-[100px]">{{ $item['location'] }}</span>
                         </div>
                     </div>
-                </div>
+                </a>
                 @endforeach
             </div>
 

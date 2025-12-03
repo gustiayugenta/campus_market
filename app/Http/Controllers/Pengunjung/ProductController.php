@@ -8,9 +8,50 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\ProductDetail;
+use App\Models\Rating;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductController extends Controller
 {
+
+    /**
+     * Display the specified product detail.
+     */
+    public function show(Request $request, $id)
+    {
+        try {
+            $product = Product::with(['seller', 'category', 'productDetails'])->findOrFail($id);
+
+            // attach a description from the first product detail (if exists)
+            $firstDetail = $product->productDetails->first();
+            $product->description = $firstDetail->description ?? ($product->description ?? null);
+
+            // Build a simple shop object the view expects
+            $product->shop = (object) ['name' => $product->seller->shop_name ?? ($product->seller->user->name ?? 'Toko')];
+
+            // related products (same category, exclude current)
+            $relatedProducts = Product::where('category_id', $product->category_id)->where('id', '!=', $product->id)->take(6)->get();
+
+            // gather reviews via product_details -> rating_reviews
+            $detailIds = $product->productDetails->pluck('id')->all();
+            $reviews = Rating::whereIn('product_detail_id', $detailIds)->orderByDesc('created_at')->get();
+
+            // map reviews to what the view expects
+            $reviews = $reviews->map(function ($r) {
+                return (object) [
+                    'user_name' => $r->name ?? 'Pembeli',
+                    'rating' => $r->rating,
+                    'comment' => $r->review,
+                    'created_at' => $r->created_at,
+                ];
+            });
+
+            return view('pengunjung.detailproduk', compact('product', 'relatedProducts', 'reviews'));
+        } catch (ModelNotFoundException $e) {
+            abort(404);
+        }
+    }
     public function index(Request $request)
     {
         $q = trim($request->query('q', ''));

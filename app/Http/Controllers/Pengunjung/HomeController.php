@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Database\QueryException;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -38,17 +41,27 @@ class HomeController extends Controller
             $productsPaginated->getCollection()->transform(function ($p) {
                 $avg = $p->ratings->count() ? round($p->ratings->avg('rating'), 1) : 4.8;
                 return [
+                    'id' => $p->id,
+                    'url' => route('products.show', $p->id),
                     'name' => $p->name,
                     'price' => 'Rp ' . number_format($p->price ?? 0, 0, ',', '.'),
                     'location' => $p->seller->province ?? ($p->seller->address ?? 'Lokasi'),
                     'rating' => $avg,
                     'sold' => property_exists($p, 'sold') ? ($p->sold ?? '0') : '0',
-                    'img' => $p->image ? asset('storage/' . $p->image) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&q=80',
+                    'img' => function_exists('asset') ? (
+                        // If it's a full URL, use it directly
+                        (filter_var($p->image, FILTER_VALIDATE_URL) ? $p->image : (
+                            // If image path starts with 'images/' assume it's in public/images
+                            (Str::startsWith($p->image, 'images/') ? asset($p->image) : asset('storage/' . ltrim($p->image, '/')))
+                        ))
+                    ) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&q=80',
                 ];
             });
 
+            Log::info('HomeController: loaded products from DB, total=' . $productsPaginated->total());
             $products = $productsPaginated;
         } catch (QueryException $e) {
+            Log::warning('HomeController: using fallback demo due to QueryException: ' . $e->getMessage());
             // Demo fallback (matches the previous demo data used in the view)
             $items = [
                 ['name' => 'Laptop Gaming ASUS ROG Bekas Mulus', 'price' => 'Rp 8.500.000', 'location' => 'Jakarta Selatan', 'rating' => '4.8', 'sold' => '12', 'img' => 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&q=80'],

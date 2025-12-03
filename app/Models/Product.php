@@ -13,9 +13,13 @@ class Product extends Model
         return $this->belongsTo(Seller::class);
     }
 
+    /**
+     * Ratings are stored on product details table (rating_reviews.product_detail_id).
+     * Use hasManyThrough through ProductDetail so $product->ratings works as expected.
+     */
     public function ratings()
     {
-        return $this->hasMany(Rating::class);
+        return $this->hasManyThrough(Rating::class, ProductDetail::class, 'product_id', 'product_detail_id', 'id', 'id');
     }
 
     public function carts()
@@ -26,5 +30,10 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function productDetails()
+    {
+        return $this->hasMany(ProductDetail::class);
     }
 }

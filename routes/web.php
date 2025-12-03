@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Pengunjung\HomeController;
 use App\Http\Controllers\Pengunjung\ProductController;
+use App\Http\Controllers\AuthController;
 
 // Halaman cetak laporan
 Route::get('/dashboard-seller/cetaklaporan', function () {
@@ -21,16 +22,20 @@ Route::get('/', [HomeController::class, 'index']);
 // Product listing / search page
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 
+// Product detail page
+Route::get('/detailproduk/{id}', [ProductController::class, 'show'])->name('products.show');
+
 // Route ke halaman Home Pengunjung
 Route::get('/detailproduk', function () {
     // Artinya: Buka file "home" yang ada di dalam folder "pengunjung"
     return view('pengunjung.detailproduk');
 });
 
-Route::get('/login-seller', function () {
-    // Artinya: Buka file "home" yang ada di dalam folder "pengunjung"
-    return view('pengunjung.login');
-});
+Route::get('/login-seller', [AuthController::class, 'showLogin']);
+
+// Login / Logout
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 Route::get('/register-seller', function () {
