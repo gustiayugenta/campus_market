@@ -75,32 +75,7 @@
 </head>
 <body class="bg-gray-50 text-slate-800 font-sans antialiased selection:bg-pink-200 selection:text-pink-900 pb-20">
 
-    {{-- DATA DUMMY --}}
-    @php
-        $categories = [
-            ['name' => 'Elektronik & Gadget', 'icon' => 'fa-laptop', 'color' => 'bg-blue-100 text-blue-600'],
-            ['name' => 'Pakaian & Aksesoris', 'icon' => 'fa-shirt', 'color' => 'bg-pink-100 text-pink-600'],
-            ['name' => 'Perabot Rumah & Dapur', 'icon' => 'fa-bed', 'color' => 'bg-emerald-100 text-emerald-600'],
-            ['name' => 'Buku & Media', 'icon' => 'fa-book', 'color' => 'bg-yellow-100 text-yellow-600'],
-            ['name' => 'Makanan & Minuman', 'icon' => 'fa-utensils', 'color' => 'bg-orange-100 text-orange-600'],
-            ['name' => 'Kendaraan & Aksesoris', 'icon' => 'fa-bicycle', 'color' => 'bg-indigo-100 text-indigo-600'],
-            ['name' => 'Kesehatan & Kecantikan', 'icon' => 'fa-heart', 'color' => 'bg-rose-100 text-rose-600'],
-            ['name' => 'Jasa & Layanan', 'icon' => 'fa-briefcase', 'color' => 'bg-purple-100 text-purple-600'],
-        ];
-
-        $products = [
-            ['name' => 'Laptop Gaming ASUS ROG Bekas Mulus', 'price' => 'Rp 8.500.000', 'location' => 'Jakarta Selatan', 'rating' => '4.8', 'sold' => '12', 'img' => 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&q=80'],
-            ['name' => 'Kemeja Flannel Uniqlo Size L', 'price' => 'Rp 150.000', 'location' => 'Bandung', 'rating' => '4.9', 'sold' => '5', 'img' => 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80'],
-            ['name' => 'Kalkulus Jilid 1 Purcell Edisi 9', 'price' => 'Rp 80.000', 'location' => 'Semarang', 'rating' => '5.0', 'sold' => '30', 'img' => 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&q=80'],
-            ['name' => 'Sepatu Converse Chuck Taylor 70s', 'price' => 'Rp 450.000', 'location' => 'Surabaya', 'rating' => '4.7', 'sold' => '8', 'img' => 'https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=500&q=80'],
-            ['name' => 'Headphone Sony WH-1000XM4', 'price' => 'Rp 3.200.000', 'location' => 'Jakarta Barat', 'rating' => '4.9', 'sold' => '42', 'img' => 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500&q=80'],
-            ['name' => 'Skincare Bundle Somethinc', 'price' => 'Rp 199.000', 'location' => 'Yogyakarta', 'rating' => '4.8', 'sold' => '150+', 'img' => 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=500&q=80'],
-            ['name' => 'Totebag Kanvas Aesthetics', 'price' => 'Rp 35.000', 'location' => 'Malang', 'rating' => '4.6', 'sold' => '88', 'img' => 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&q=80'],
-            ['name' => 'Mouse Logitech G304 Wireless', 'price' => 'Rp 400.000', 'location' => 'Medan', 'rating' => '4.9', 'sold' => '200+', 'img' => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&q=80'],
-            ['name' => 'Keyboard Keychron K2 V2', 'price' => 'Rp 1.100.000', 'location' => 'Jakarta Pusat', 'rating' => '4.8', 'sold' => '15', 'img' => 'https://images.unsplash.com/photo-1587829741301-dc798b91a603?w=500&q=80'],
-            ['name' => 'Meja Belajar Minimalis Ikea', 'price' => 'Rp 250.000', 'location' => 'Bogor', 'rating' => '4.5', 'sold' => '3', 'img' => 'https://images.unsplash.com/photo-1519947486511-4639940be43a?w=500&q=80'],
-        ];
-    @endphp
+    {{-- Data now provided by `HomeController@index` (DB-driven) --}}
 
     {{-- NAVBAR SECTION --}}
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm transition-all duration-300" id="navbar">
@@ -162,7 +137,7 @@
         </div>
         
         <div class="grid grid-cols-5 md:grid-cols-10 gap-y-6 gap-x-2 animate-on-scroll bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-            @foreach($categories as $cat)
+            @foreach(($categories ?? []) as $cat)
             <div class="group cursor-pointer flex flex-col items-center gap-2 transition hover:-translate-y-1">
                 <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl {{ $cat['color'] }} flex items-center justify-center text-lg shadow-sm border border-white group-hover:shadow-md transition-all duration-300">
                     <i class="fa-solid {{ $cat['icon'] }}"></i>
@@ -182,57 +157,63 @@
             <a href="#" class="text-[#FF9894] font-semibold text-sm hover:underline">Lihat Semua</a>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-            @foreach($products as $index => $item)
-            <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-300 cursor-pointer group overflow-hidden animate-on-scroll flex flex-col h-full" style="animation-delay: {{ $index * 50 }}ms">
-                
-                <div class="relative aspect-square bg-gray-100 overflow-hidden">
-                    <img src="{{ $item['img'] }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    
-                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <p class="text-white text-[10px] font-medium flex items-center gap-1">
-                            <i class="fa-solid fa-location-dot"></i> {{ $item['location'] }}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="p-3 flex flex-col flex-1">
-                    <h4 class="text-xs md:text-sm text-gray-700 font-normal leading-snug line-clamp-2 mb-1 group-hover:text-pink-600 transition-colors">
-                        {{ $item['name'] }}
-                    </h4>
-
-                    <div class="mt-1 mb-2">
-                        <p class="text-sm md:text-base font-bold text-slate-900">{{ $item['price'] }}</p>
-                    </div>
-
-                    <div class="flex items-center gap-1 mt-auto text-[10px] text-gray-500">
-                        <i class="fa-solid fa-star text-yellow-400"></i>
-                        <span class="font-medium text-gray-600">{{ $item['rating'] }}</span>
-                        <span class="text-gray-300 mx-1">|</span>
-                        <span>Terjual {{ $item['sold'] }}</span>
-                    </div>
-
-                    <div class="flex items-center gap-1 mt-1 text-[10px] text-gray-400">
-                         <i class="fa-solid fa-shop"></i>
-                         <span class="truncate max-w-[100px]">{{ $item['location'] }}</span>
-                    </div>
-                </div>
+        @if(empty($products) || count($products) == 0)
+            <div class="bg-white rounded-lg p-8 text-center border border-gray-100 shadow-sm">
+                <p class="text-gray-600 font-medium">Produk tidak ditemukan.</p>
             </div>
-            @endforeach
-        </div>
+        @else
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+                @foreach(($products ?? []) as $index => $item)
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-300 cursor-pointer group overflow-hidden animate-on-scroll flex flex-col h-full" style="animation-delay: {{ $index * 50 }}ms">
+                    
+                    <div class="relative aspect-square bg-gray-100 overflow-hidden">
+                        <img src="{{ $item['img'] }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <p class="text-white text-[10px] font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-location-dot"></i> {{ $item['location'] }}
+                            </p>
+                        </div>
+                    </div>
 
-        <div class="text-center mt-10">
-            <button class="bg-white border border-[#FF9894] text-[#FF9894] px-8 py-2 rounded-lg font-bold text-sm hover:bg-pink-50 transition shadow-sm">
-                Muat Lebih Banyak
-            </button>
-        </div>
+                    <div class="p-3 flex flex-col flex-1">
+                        <h4 class="text-xs md:text-sm text-gray-700 font-normal leading-snug line-clamp-2 mb-1 group-hover:text-pink-600 transition-colors">
+                            {{ $item['name'] }}
+                        </h4>
+
+                        <div class="mt-1 mb-2">
+                            <p class="text-sm md:text-base font-bold text-slate-900">{{ $item['price'] }}</p>
+                        </div>
+
+                        <div class="flex items-center gap-1 mt-auto text-[10px] text-gray-500">
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <span class="font-medium text-gray-600">{{ $item['rating'] }}</span>
+                            <span class="text-gray-300 mx-1">|</span>
+                            <span>Terjual {{ $item['sold'] }}</span>
+                        </div>
+
+                        <div class="flex items-center gap-1 mt-1 text-[10px] text-gray-400">
+                             <i class="fa-solid fa-shop"></i>
+                             <span class="truncate max-w-[100px]">{{ $item['location'] }}</span>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <div class="text-center mt-10">
+                <button class="bg-white border border-[#FF9894] text-[#FF9894] px-8 py-2 rounded-lg font-bold text-sm hover:bg-pink-50 transition shadow-sm">
+                    Muat Lebih Banyak
+                </button>
+            </div>
+        @endif
     </section>
 
     {{-- FOOTER --}}
     <x-footer />
     
-    <button id="scrollToTop" class="fixed bottom-6 right-6 bg-pink-500 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center translate-y-20 opacity-0 transition-all duration-300 hover:bg-pink-600 hover:-translate-y-1 z-40">
-        <i class="fa-solid fa-arrow-up"></i>
+    <button id="scrollToTop" class="fixed bottom-8 right-8 bg-primary-600 text-white p-4 rounded-full shadow-lg translate-y-20 opacity-0 transition-all duration-300 hover:bg-red-500 z-50">
+        <i class="fas fa-arrow-up"></i>
     </button>
 
     {{-- JAVASCRIPT LOGIC --}}

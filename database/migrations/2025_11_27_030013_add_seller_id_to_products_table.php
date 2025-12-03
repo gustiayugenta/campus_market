@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->foreignId('seller_id')->after('id')->constrained()->onDelete('cascade');
-        });
+        // Deprecated/placeholder migration kept for history. The real add-seller
+        // migration was moved to a later timestamp to ensure products table
+        // exists before altering it.
     }
 
     /**
@@ -21,9 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropForeignKeyConstraints();
-            $table->dropColumn('seller_id');
-        });
+        // No-op
     }
 };

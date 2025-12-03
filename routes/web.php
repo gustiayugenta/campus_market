@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Pengunjung\HomeController;
 
 // Halaman cetak laporan
 Route::get('/dashboard-seller/cetaklaporan', function () {
@@ -13,11 +14,8 @@ Route::get('/dashboard-seller/tambahproduk', function () {
 })->name('seller.tambahproduk');
 
 
-// Route ke halaman Home Pengunjung
-Route::get('/', function () {
-    // Artinya: Buka file "home" yang ada di dalam folder "pengunjung"
-    return view('pengunjung.home');
-});
+// Route ke halaman Home Pengunjung (via controller)
+Route::get('/', [HomeController::class, 'index']);
 
 // Route ke halaman Home Pengunjung
 Route::get('/detailproduk', function () {

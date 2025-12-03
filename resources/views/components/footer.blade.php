@@ -10,9 +10,9 @@
 					Platform marketplace terdepan yang menghubungkan penjual berkualitas dengan jutaan pelanggan di seluruh Indonesia.
 				</p>
 				<div class="flex items-center gap-3 mt-4">
-					<a href="#" class="inline-flex items-center justify-center w-9 h-9 bg-pink-50 text-pink-600 rounded-full hover:bg-pink-600 hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
-					<a href="#" class="inline-flex items-center justify-center w-9 h-9 bg-pink-50 text-pink-600 rounded-full hover:bg-pink-600 hover:text-white transition"><i class="fab fa-instagram"></i></a>
-					<a href="#" class="inline-flex items-center justify-center w-9 h-9 bg-pink-50 text-pink-600 rounded-full hover:bg-pink-600 hover:text-white transition"><i class="fab fa-twitter"></i></a>
+					<a href="#" class="inline-flex items-center justify-center w-9 h-9 bg-pink-50 text-[#FF9894] rounded-full hover:bg-[#FF9894] hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
+					<a href="#" class="inline-flex items-center justify-center w-9 h-9 bg-pink-50 text-[#FF9894] rounded-full hover:bg-[#FF9894] hover:text-white transition"><i class="fab fa-instagram"></i></a>
+					<a href="#" class="inline-flex items-center justify-center w-9 h-9 bg-pink-50 text-[#FF9894] rounded-full hover:bg-[#FF9894] hover:text-white transition"><i class="fab fa-twitter"></i></a>
 				</div>
 			</div>
 
