@@ -53,6 +53,15 @@ class UsersSeeder extends Seeder
                 'role' => 'Penjual',
                 'created_at' => now(),
             ],
+            [
+                'id' => 5,
+                'name' => 'Rara',
+                'email' => 'rara@gmail.com',
+                'number_phone' => '085678901234',
+                'password' => Hash::make('Rara123'),
+                'role' => 'Penjual',
+                'created_at' => now(),
+            ],
         ]);
     }
 }

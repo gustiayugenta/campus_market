@@ -45,7 +45,9 @@ class HomeController extends Controller
                     'url' => route('products.show', $p->id),
                     'name' => $p->name,
                     'price' => 'Rp ' . number_format($p->price ?? 0, 0, ',', '.'),
-                    'location' => $p->seller->province ?? ($p->seller->address ?? 'Lokasi'),
+                    'location' => $p->seller->region->name 
+                                ?? $p->seller->region->region_name 
+                                ?? 'Tidak diketahui',
                     'rating' => $avg,
                     'sold' => property_exists($p, 'sold') ? ($p->sold ?? '0') : '0',
                     'img' => function_exists('asset') ? (
@@ -63,26 +65,26 @@ class HomeController extends Controller
         } catch (QueryException $e) {
             Log::warning('HomeController: using fallback demo due to QueryException: ' . $e->getMessage());
             // Demo fallback (matches the previous demo data used in the view)
-            $items = [
-                ['url' => '#', 'name' => 'Laptop Gaming ASUS ROG Bekas Mulus', 'price' => 'Rp 8.500.000', 'location' => 'Jakarta Selatan', 'rating' => '4.8', 'sold' => '12', 'img' => 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&q=80'],
-                ['url' => '#', 'name' => 'Kemeja Flannel Uniqlo Size L', 'price' => 'Rp 150.000', 'location' => 'Bandung', 'rating' => '4.9', 'sold' => '5', 'img' => 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80'],
-                ['url' => '#', 'name' => 'Kalkulus Jilid 1 Purcell Edisi 9', 'price' => 'Rp 80.000', 'location' => 'Semarang', 'rating' => '5.0', 'sold' => '30', 'img' => 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&q=80'],
-                ['url' => '#', 'name' => 'Sepatu Converse Chuck Taylor 70s', 'price' => 'Rp 450.000', 'location' => 'Surabaya', 'rating' => '4.7', 'sold' => '8', 'img' => 'https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=500&q=80'],
-                ['url' => '#', 'name' => 'Headphone Sony WH-1000XM4', 'price' => 'Rp 3.200.000', 'location' => 'Jakarta Barat', 'rating' => '4.9', 'sold' => '42', 'img' => 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500&q=80'],
-                ['url' => '#', 'name' => 'Skincare Bundle Somethinc', 'price' => 'Rp 199.000', 'location' => 'Yogyakarta', 'rating' => '4.8', 'sold' => '150+', 'img' => 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=500&q=80'],
-                ['url' => '#', 'name' => 'Totebag Kanvas Aesthetics', 'price' => 'Rp 35.000', 'location' => 'Malang', 'rating' => '4.6', 'sold' => '88', 'img' => 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&q=80'],
-                ['url' => '#', 'name' => 'Mouse Logitech G304 Wireless', 'price' => 'Rp 400.000', 'location' => 'Medan', 'rating' => '4.9', 'sold' => '200+', 'img' => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&q=80'],
-                ['url' => '#', 'name' => 'Keyboard Keychron K2 V2', 'price' => 'Rp 1.100.000', 'location' => 'Jakarta Pusat', 'rating' => '4.8', 'sold' => '15', 'img' => 'https://images.unsplash.com/photo-1587829741301-dc798b91a603?w=500&q=80'],
-                ['url' => '#', 'name' => 'Meja Belajar Minimalis Ikea', 'price' => 'Rp 250.000', 'location' => 'Bogor', 'rating' => '4.5', 'sold' => '3', 'img' => 'https://images.unsplash.com/photo-1519947486511-4639940be43a?w=500&q=80'],
-            ];
+            // $items = [
+            //     ['url' => '#', 'name' => 'Laptop Gaming ASUS ROG Bekas Mulus', 'price' => 'Rp 8.500.000', 'location' => 'Jakarta Selatan', 'rating' => '4.8', 'sold' => '12', 'img' => 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&q=80'],
+            //     ['url' => '#', 'name' => 'Kemeja Flannel Uniqlo Size L', 'price' => 'Rp 150.000', 'location' => 'Bandung', 'rating' => '4.9', 'sold' => '5', 'img' => 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80'],
+            //     ['url' => '#', 'name' => 'Kalkulus Jilid 1 Purcell Edisi 9', 'price' => 'Rp 80.000', 'location' => 'Semarang', 'rating' => '5.0', 'sold' => '30', 'img' => 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&q=80'],
+            //     ['url' => '#', 'name' => 'Sepatu Converse Chuck Taylor 70s', 'price' => 'Rp 450.000', 'location' => 'Surabaya', 'rating' => '4.7', 'sold' => '8', 'img' => 'https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=500&q=80'],
+            //     ['url' => '#', 'name' => 'Headphone Sony WH-1000XM4', 'price' => 'Rp 3.200.000', 'location' => 'Jakarta Barat', 'rating' => '4.9', 'sold' => '42', 'img' => 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500&q=80'],
+            //     ['url' => '#', 'name' => 'Skincare Bundle Somethinc', 'price' => 'Rp 199.000', 'location' => 'Yogyakarta', 'rating' => '4.8', 'sold' => '150+', 'img' => 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=500&q=80'],
+            //     ['url' => '#', 'name' => 'Totebag Kanvas Aesthetics', 'price' => 'Rp 35.000', 'location' => 'Malang', 'rating' => '4.6', 'sold' => '88', 'img' => 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&q=80'],
+            //     ['url' => '#', 'name' => 'Mouse Logitech G304 Wireless', 'price' => 'Rp 400.000', 'location' => 'Medan', 'rating' => '4.9', 'sold' => '200+', 'img' => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&q=80'],
+            //     ['url' => '#', 'name' => 'Keyboard Keychron K2 V2', 'price' => 'Rp 1.100.000', 'location' => 'Jakarta Pusat', 'rating' => '4.8', 'sold' => '15', 'img' => 'https://images.unsplash.com/photo-1587829741301-dc798b91a603?w=500&q=80'],
+            //     ['url' => '#', 'name' => 'Meja Belajar Minimalis Ikea', 'price' => 'Rp 250.000', 'location' => 'Bogor', 'rating' => '4.5', 'sold' => '3', 'img' => 'https://images.unsplash.com/photo-1519947486511-4639940be43a?w=500&q=80'],
+            // ];
 
-            $perPage = 12;
-            $page = max(1, (int) $request->query('page', 1));
+            // $perPage = 12;
+            // $page = max(1, (int) $request->query('page', 1));
 
-            $products = new LengthAwarePaginator(array_slice($items, ($page - 1) * $perPage, $perPage), count($items), $perPage, $page, [
-                'path' => url()->current(),
-                'query' => $request->query(),
-            ]);
+            // $products = new LengthAwarePaginator(array_slice($items, ($page - 1) * $perPage, $perPage), count($items), $perPage, $page, [
+            //     'path' => url()->current(),
+            //     'query' => $request->query(),
+            // ]);
         }
 
         // Attempt to load categories from the database. If categories table is missing

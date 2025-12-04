@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('shop_image')->nullable();
             $table->string('phone');
             $table->string('address');
+            $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('region_id');
             $table->timestamps();
 

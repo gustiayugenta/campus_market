@@ -11,6 +11,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\ProductDetail;
 use App\Models\Rating;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -125,43 +126,44 @@ class ProductController extends Controller
             });
 
         } catch (QueryException $e) {
+            Log::warning('HomeController: using fallback demo due to QueryException: ' . $e->getMessage());
             // fallback demo
-            $items = [
-                [
-                    'id'       => 1,
-                    'url'      => '#',
-                    'name'     => 'Laptop Gaming ASUS ROG Bekas Mulus',
-                    'price'    => 'Rp 8.500.000',
-                    'location' => 'Jakarta Selatan',
-                    'rating'   => '4.8',
-                    'sold'     => '12',
-                    'img'      => 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&q=80',
-                ],
-                [
-                    'id'       => 2,
-                    'url'      => '#',
-                    'name'     => 'Kemeja Flannel Uniqlo Size L',
-                    'price'    => 'Rp 150.000',
-                    'location' => 'Bandung',
-                    'rating'   => '4.9',
-                    'sold'     => '5',
-                    'img'      => 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80',
-                ],
-            ];
+            // $items = [
+            //     [
+            //         'id'       => 1,
+            //         'url'      => '#',
+            //         'name'     => 'Laptop Gaming ASUS ROG Bekas Mulus',
+            //         'price'    => 'Rp 8.500.000',
+            //         'location' => 'Jakarta Selatan',
+            //         'rating'   => '4.8',
+            //         'sold'     => '12',
+            //         'img'      => 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&q=80',
+            //     ],
+            //     [
+            //         'id'       => 2,
+            //         'url'      => '#',
+            //         'name'     => 'Kemeja Flannel Uniqlo Size L',
+            //         'price'    => 'Rp 150.000',
+            //         'location' => 'Bandung',
+            //         'rating'   => '4.9',
+            //         'sold'     => '5',
+            //         'img'      => 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80',
+            //     ],
+            // ];
 
-            $perPage = 12;
-            $page = max(1, (int) $request->query('page', 1));
+            // $perPage = 12;
+            // $page = max(1, (int) $request->query('page', 1));
 
-            $products = new LengthAwarePaginator(
-                array_slice($items, ($page - 1) * $perPage, $perPage),
-                count($items),
-                $perPage,
-                $page,
-                [
-                    'path'  => url()->current(),
-                    'query' => $request->query(),
-                ]
-            );
+            // $products = new LengthAwarePaginator(
+            //     array_slice($items, ($page - 1) * $perPage, $perPage),
+            //     count($items),
+            //     $perPage,
+            //     $page,
+            //     [
+            //         'path'  => url()->current(),
+            //         'query' => $request->query(),
+            //     ]
+            // );
         }
 
         return view('pengunjung.products', [
