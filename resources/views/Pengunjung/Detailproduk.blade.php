@@ -300,9 +300,15 @@
                     <button id="close-modal" class="w-9 h-9 rounded-full bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
                 
-                <form action="{{ route('ratings.store') }}" method="POST" class="p-8 overflow-y-auto custom-scroll space-y-6">
+                <form id="rating-form" action="{{ route('ratings.store') }}" method="POST" class="p-8 overflow-y-auto custom-scroll space-y-6">
                     @csrf
                     <input type="hidden" name="product_detail_id" value="{{ $firstDetailId ?? ($product->productDetails->first()->id ?? '') }}">
+                    @error('product_detail_id')
+                        <div class="bg-red-50 text-red-500 text-xs p-2 rounded-lg border border-red-100 text-center">
+                            Produk ini belum memiliki varian/detail, sehingga belum bisa dirating.
+                        </div>
+                    @enderror
+
                     <div class="text-center bg-yellow-50/30 p-6 rounded-3xl border border-dashed border-yellow-200">
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Rating Kamu</label>
                         <div id="form-star-rating" class="flex justify-center text-4xl gap-3 cursor-pointer">
@@ -312,20 +318,23 @@
                             <i class="fa-regular fa-star form-star text-gray-300 hover:text-yellow-400 transition transform hover:scale-110" data-value="4"></i>
                             <i class="fa-regular fa-star form-star text-gray-300 hover:text-yellow-400 transition transform hover:scale-110" data-value="5"></i>
                         </div>
-                        <input type="hidden" name="rating" id="rating-value" value="">
+                        <input type="hidden" name="rating" id="rating-value" value="{{ old('rating') }}">
+                        @error('rating') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
                         <div id="rating-text" class="text-sm font-bold text-[#FF7A7A] mt-3 h-5 tracking-wide uppercase"></div>
                     </div>
 
                     <div class="space-y-5">
                         <div class="group">
                             <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Nama Lengkap</label>
-                            <input type="text" id="review-name" name="name" class="form-input" placeholder="Contoh: Budi Santoso" required>
+                            <input type="text" id="review-name" name="name" class="form-input @error('name') border-red-500 @enderror" placeholder="Contoh: Budi Santoso" value="{{ old('name') }}" required>
+                            @error('name') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
                         </div>
                         
                         <div class="grid grid-cols-2 gap-5">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">No. HP</label>
-                                <input type="tel" id="review-phone" name="no_telp" class="form-input" placeholder="0812...">
+                                <input type="tel" id="review-phone" name="no_telp" class="form-input @error('no_telp') border-red-500 @enderror" placeholder="0812..." value="{{ old('no_telp') }}">
+                                @error('no_telp') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Provinsi</label>
@@ -340,19 +349,21 @@
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Email (Untuk Notifikasi)</label>
-                            <input type="email" id="review-email" name="email" class="form-input" placeholder="email@contoh.com" required>
+                            <input type="email" id="review-email" name="email" class="form-input @error('email') border-red-500 @enderror" placeholder="email@contoh.com" value="{{ old('email') }}" required>
+                            @error('email') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Ulasan Kamu</label>
-                            <textarea id="review-comment" name="review" rows="3" class="form-input resize-none" placeholder="Ceritakan detail kualitas barang..."></textarea>
+                            <textarea id="review-comment" name="review" rows="3" class="form-input resize-none @error('review') border-red-500 @enderror" placeholder="Ceritakan detail kualitas barang...">{{ old('review') }}</textarea>
+                            @error('review') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
                         </div>
                     </div>
                 </form>
 
                 <div class="p-6 border-t border-gray-100 bg-gray-50 flex gap-4">
                     <button id="cancel-review" type="button" class="flex-1 py-3.5 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-2xl transition">Batal</button>
-                    <button id="submit-review" type="submit" class="flex-[2] py-3.5 text-sm font-bold bg-[#FF7A7A] hover:bg-[#ff6363] text-white rounded-2xl shadow-lg shadow-pink-200 hover:shadow-pink-300 transition transform active:scale-[0.98]">Kirim Ulasan</button>
+                    <button id="submit-review" type="submit" form="rating-form" class="flex-[2] py-3.5 text-sm font-bold bg-[#FF7A7A] hover:bg-[#ff6363] text-white rounded-2xl shadow-lg shadow-pink-200 hover:shadow-pink-300 transition transform active:scale-[0.98]">Kirim Ulasan</button>
                 </div>
             </div>
         </div>
@@ -381,6 +392,10 @@
 
             openBtns.forEach(btn => { if(btn) btn.addEventListener('click', () => toggleModal(true)); });
             [closeBtn, cancelBtn, closeBg].forEach(btn => { if(btn) btn.addEventListener('click', () => toggleModal(false)); });
+
+            @if($errors->any())
+                toggleModal(true);
+            @endif
 
             const provSelect = qs('#review-provinsi');
             if (provSelect) {

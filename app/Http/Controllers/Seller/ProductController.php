@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Product;
+use App\Models\ProductDetail;
 use App\Models\Category;
 use App\Models\Region;
 use Illuminate\Http\RedirectResponse;
@@ -107,6 +108,7 @@ class ProductController extends Controller
             'region_id' => 'nullable|exists:region,id',
             'image' => 'nullable|image|max:2048',
             'is_active' => 'nullable|boolean',
+            'description' => 'nullable|string',
         ]);
 
         // Handle image upload (take first file if provided)
@@ -140,6 +142,12 @@ class ProductController extends Controller
         }
 
         $product->save();
+
+        // Create Product Detail (Description)
+        ProductDetail::create([
+            'product_id' => $product->id,
+            'description' => $validated['description'] ?? 'Deskripsi produk belum ditambahkan.',
+        ]);
 
         return redirect()->route('seller.produk')->with('success', 'Produk berhasil ditambahkan.');
     }
@@ -193,10 +201,20 @@ class ProductController extends Controller
         $product->price = $validated['price'];
         $product->stock = $validated['stock'] ?? $product->stock;
         $product->category_id = $validated['category_id'];
-        // Only assign description if the products table actually has the column
-        if (Schema::hasColumn('products', 'description')) {
-            $product->description = $validated['description'] ?? $product->description;
+        
+        // Update Product Detail (Description)
+        $detail = ProductDetail::where('product_id', $product->id)->first();
+        if ($detail) {
+            $detail->description = $validated['description'] ?? $detail->description;
+            $detail->save();
+        } else {
+            // Create if missing
+            ProductDetail::create([
+                'product_id' => $product->id,
+                'description' => $validated['description'] ?? 'Deskripsi produk belum ditambahkan.',
+            ]);
         }
+
         $product->is_active = isset($validated['is_active']) ? (bool) $validated['is_active'] : $product->is_active;
 
         if ($request->hasFile('image')) {

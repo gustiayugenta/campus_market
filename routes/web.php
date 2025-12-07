@@ -113,3 +113,5 @@ Route::get('/detailproduk/demo', function () {
     return view('pengunjung.detailproduk', compact('product', 'relatedProducts', 'reviews'));
 });
 // End of routes
+
+require __DIR__.'/debug_ratings.php';
