@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Pengunjung\HomeController;
 use App\Http\Controllers\Pengunjung\ProductController;
+use App\Http\Controllers\Pengunjung\RatingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Seller\DashboardController;
 
@@ -20,6 +21,9 @@ Route::get('/products', [ProductController::class, 'index'])->name('products.ind
 
 // Product detail page
 Route::get('/detailproduk/{id}', [ProductController::class, 'show'])->name('products.show');
+
+// Ratings: submit review (one per product per email)
+Route::post('/ratings', [RatingController::class, 'store'])->name('ratings.store');
 
 // Route ke halaman Home Pengunjung
 Route::get('/detailproduk', function () {
@@ -108,3 +112,4 @@ Route::get('/dashboard-admin/reports', function () {
 Route::get('/detailproduk/demo', function () {
     return view('pengunjung.detailproduk', compact('product', 'relatedProducts', 'reviews'));
 });
+// End of routes

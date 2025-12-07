@@ -3,384 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    {{-- Data diambil penuh dari Controller. Tanpa fallback di Blade. --}}
     @php
-        // Demo Fallbacks (Logic Tetap)
-        if (!isset($product)) {
-            $product = (object) [
-                'id' => 0,
-                'name' => 'Kalung Wanita Kupu-Kupu Perak - Kalung Murah Kekinian',
-                'image' => 'placeholder.png', 
-                'price' => 200000,
-                'description' => "Kalung perak wanita dengan liontin kupu-kupu yang elegan.\n\nSpesifikasi:\n- Bahan: Silver 925\n- Panjang: 45cm\n- Anti karat dan tahan lama.\n\nCocok untuk hadiah atau pemakaian sehari-hari.",
-                'shop' => (object) ['name' => 'Beauty Jewelry']
-            ];
-        }
-
-        if (!isset($reviews) || !($reviews instanceof \Illuminate\Support\Collection)) {
-            $reviews = \Illuminate\Support\Collection::make([]);
+        $avgRating = isset($reviews) && $reviews instanceof \Illuminate\Support\Collection && $reviews->count() > 0 
+            ? $reviews->avg('rating') 
+            : 0;
+        $totalReviews = isset($reviews) && $reviews instanceof \Illuminate\Support\Collection ? $reviews->count() : 0;
+        $starCounts = [1=>0, 2=>0, 3=>0, 4=>0, 5=>0];
+        if (isset($reviews) && $reviews instanceof \Illuminate\Support\Collection) {
+            foreach($reviews as $r) { 
+                if(isset($starCounts[$r->rating])) $starCounts[$r->rating]++; 
+            }
         }
     @endphp
+
     <title>{{ $product->name }} - CampusMarket</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap');
-        body { font-family: 'Open Sans', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #FAFAFA; color: #334155; }
+        #navbar { font-family: 'Open Sans', sans-serif; } 
 
-        /* Warna Utama (Pink Theme) */
         :root { 
             --primary: #FF7A7A; 
             --primary-hover: #ff6363;
         }
 
-        /* Background Gradient */
-            .page-bg { background: #FFEBEB; }
-
-        /* Utilities */
-        .text-primary { color: var(--primary); }
-        .bg-primary { background-color: var(--primary); }
-        .border-primary { border-color: var(--primary); }
+        /* Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
         
-        /* Tokopedia-like Shadows & Cards */
-        .card-shadow { box-shadow: 0 8px 24px rgba(15,23,42,0.06); border-radius: 12px; }
-        .sticky-card { position: sticky; top: 100px; }
-
-        /* Card helpers */
-        .product-price { font-size: 1.5rem; font-weight: 800; color: #111827; }
-        .card-sub { color: #6b7280; font-size: .875rem; }
-        
-        /* Form Inputs */
-        .form-input {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 1px var(--primary);
-        }
+        /* Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-up { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .email-toast { animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     </style>
+    
     <style type="text/tailwindcss">
         .tokped-container {
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: 1rem;
-            padding-right: 1rem;
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
         }
-        @media (min-width: 768px) {
-            .tokped-container {
-                padding-left: 1.5rem;
-                padding-right: 1.5rem;
-            }
+        .form-input {
+            @apply w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-[#FF7A7A] transition-colors placeholder-gray-400;
         }
     </style>
 </head>
-<body class="page-bg min-h-screen text-gray-700 pb-20 md:pb-0">
+<body class="pb-24 relative">
 
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm transition-all duration-300" id="navbar">
-        <div class="tokped-container h-16 flex items-center justify-between gap-6">
-            <a href="/" class="flex items-center gap-2 text-[#FF9894] hover:text-pink-600 transition group">
-                <div class="bg-pink-50 p-2 rounded-lg group-hover:bg-pink-100 transition">
-                    <i class="fa-solid fa-bag-shopping text-xl"></i>
+    <div id="notification-area" class="fixed top-24 right-5 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+
+    <x-navbar />
+
+    <main class="tokped-container py-8 grid grid-cols-1 md:grid-cols-12 gap-10">
+        
+        <div class="md:col-span-5 lg:col-span-4">
+            <div class="sticky top-24 space-y-4">
+                <div class="aspect-square bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm relative group cursor-pointer">
+                    @php
+                        $imgUrl = $product->image_url ?? $product->image ?? 'placeholder.png';
+                        if (!filter_var($imgUrl, FILTER_VALIDATE_URL)) {
+                            if (\Str::startsWith($imgUrl, 'storage/')) {
+                                $imgUrl = asset($imgUrl);
+                            } elseif (\Str::startsWith($imgUrl, '/storage/')) {
+                                $imgUrl = asset($imgUrl);
+                            } elseif (\Str::startsWith($imgUrl, 'images/')) {
+                                $imgUrl = asset($imgUrl);
+                            } else {
+                                $imgUrl = asset('storage/' . ltrim($imgUrl, '/'));
+                            }
+                        }
+                    @endphp
+                    <img src="{{ $imgUrl }}" 
+                         alt="{{ $product->name }}" 
+                         class="w-full h-full object-cover transition duration-500 group-hover:scale-105" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/600x600/png?text=Produk+Image';">
                 </div>
-                <span class="font-bold text-xl tracking-tight hidden md:block">SiToko</span>
-            </a>
-
-            <div class="hidden md:flex flex-1 max-w-2xl relative">
-                <input type="text" placeholder="Cari barang di SiToko..." class="w-full border border-gray-300 rounded-lg py-2 px-4 pl-10 focus:outline-none focus:border-[#FF9894] focus:ring-1 focus:ring-[#FF9894] transition-all text-sm">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-sm"></i>
-            </div>
-
-            <div class="flex items-center gap-3 shrink-0">
-                <a href="/login-seller" class="text-sm font-semibold text-gray-600 hover:text-[#FF7A7A] transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-store"></i> Masuk Toko
-                </a>
-                
-                <a href="/register-seller" class="bg-[#FF7A7A] text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-[#ff6363] hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> Buka Toko
-                </a>
             </div>
         </div>
-    </nav>
 
-    <main class="tokped-container py-6 md:py-8">
-        
-        <div class="text-xs text-primary mb-4 font-medium">Home &gt; Fashion &gt; {{ $product->name }}</div>
+        <div class="md:col-span-7 lg:col-span-8 space-y-5">
+            <nav class="flex text-xs text-gray-500 font-medium mb-4">
+                <a href="/" class="hover:text-[#FF7A7A] transition">Home</a>
+                <span class="mx-2">/</span>
+                <span>{{ $product->category->name ?? 'Kategori' }}</span>
+                <span class="mx-2">/</span>
+                <span class="text-[#FF7A7A] truncate">{{ $product->name }}</span>
+            </nav>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-            
-            <div class="md:col-span-4 lg:col-span-4">
-                <div class="sticky top-24">
-                    <div class="aspect-square rounded-xl overflow-hidden border border-gray-100 card-shadow relative group bg-white">
-                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                </div>
-            </div>
-
-            <div class="md:col-span-8 lg:col-span-5 space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <h1 class="text-2xl font-bold text-slate-900 leading-tight mb-4">{{ $product->name }}</h1>
                 
-                <div class="bg-white md:bg-transparent rounded-xl p-4 md:p-0 card-shadow md:shadow-none">
-                    <h1 class="text-xl md:text-2xl font-bold text-gray-800 leading-snug mb-2">{{ $product->name }}</h1>
-                    
-                    <div class="flex items-center gap-2 text-sm mb-3">
-                        <span class="font-bold text-gray-800">Terjual 300+</span>
-                        <span class="text-gray-300">•</span>
-                        <div class="flex items-center text-yellow-400 gap-1">
-                            <i class="fa-solid fa-star"></i>
-                            <span class="text-gray-800 font-bold" id="avg-rating">4.9</span>
-                            <span class="text-gray-500 font-normal" id="avg-count">({{ $reviews->count() }} rating)</span>
-                        </div>
+                <div class="flex items-center gap-4 text-sm mb-5 pb-5 border-b border-gray-100">
+                    <div class="flex items-center gap-1 text-yellow-400">
+                        <i class="fa-solid fa-star"></i>
+                        <span class="font-bold text-slate-900 ml-1">{{ number_format($avgRating, 1) }}</span>
                     </div>
-
-                    <div class="text-3xl font-bold text-gray-800 md:hidden block mb-4">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
+                    <div class="w-px h-4 bg-gray-200"></div>
+                    <div class="text-slate-600">{{ $totalReviews }} ulasan</div>
                 </div>
 
-                <div class="bg-white rounded-xl p-6 card-shadow">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-bold text-gray-800">Detail Produk</h2>
-                        <div class="text-sm text-gray-500">• {{ $product->shop->name }}</div>
-                    </div>
+                <div class="mb-6">
+                    <div class="text-3xl font-bold text-[#FF7A7A]">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
+                </div>
 
+                <div class="prose prose-sm max-w-none text-slate-600">
+                    <h3 class="font-bold text-slate-900 text-base mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-[#FF7A7A]"></i> Detail Produk
+                    </h3>
+                    
                     @php
                         $descLines = preg_split('/\r\n|\r|\n/', trim($product->description ?? '')) ?: [];
                         $paras = array_values(array_filter($descLines, function($l){ return trim($l) !== '' && substr(trim($l),0,1) !== '-'; }));
                         $bullets = array_values(array_filter($descLines, function($l){ return substr(trim($l),0,1) === '-'; }));
                     @endphp
 
-                    <div class="text-sm text-gray-600 leading-relaxed">
-                        @if(count($paras))
-                            @foreach($paras as $p)
-                                <p class="mb-3">{{ $p }}</p>
-                            @endforeach
-                        @endif
-
+                    <div class="space-y-3">
+                        @foreach($paras as $p) <p class="leading-relaxed text-sm">{{ $p }}</p> @endforeach
                         @if(count($bullets))
-                            <div class="mt-3">
-                                <h4 class="font-semibold text-gray-700 mb-2">Spesifikasi</h4>
-                                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                                    @foreach($bullets as $b)
-                                        <li>{{ ltrim($b, "- ") }}</li>
+                            <div class="mt-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <h4 class="font-semibold text-xs text-gray-600 uppercase mb-3 tracking-wide">Spesifikasi</h4>
+                                <ul class="space-y-2">
+                                    @foreach($bullets as $b) 
+                                        <li class="flex items-start gap-2 text-sm">
+                                            <i class="fa-solid fa-circle-check text-[#FF7A7A] text-xs mt-0.5"></i>
+                                            <span>{{ ltrim($b, "- ") }}</span>
+                                        </li> 
                                     @endforeach
                                 </ul>
                             </div>
                         @endif
                     </div>
-
-                    <div class="mt-6 pt-4 border-t border-gray-100 flex items-center gap-3">
-                        <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white text-xl">
-                            <i class="fa-solid fa-store"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-gray-800">{{ $product->shop->name }}</div>
-                            <!-- Online status removed per request -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl p-0 pt-2">
-                    <h3 class="font-bold text-gray-800 text-lg mb-4">Ulasan Pembeli</h3>
-                    
-                    <div class="flex items-center gap-4 mb-6 bg-gray-50 p-4 rounded-lg">
-                        <div class="text-4xl font-bold text-gray-800 flex items-end">
-                            <span id="big-avg">4.9</span><span class="text-lg text-gray-400 font-normal">/5</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <div class="flex text-yellow-400 text-sm mb-1">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            </div>
-                            <div class="text-xs text-gray-500 font-medium">{{ $reviews->count() }} Ulasan</div>
-                        </div>
-                    </div>
-
-                    <div class="text-sm font-semibold text-gray-800 mb-4 pb-2 border-b">Paling Relevan</div>
-
-                    <div id="reviews-list" class="space-y-4">
-                        @forelse($reviews as $review)
-                            <div class="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">
-                                        {{ strtoupper(substr(trim($review->user_name),0,2)) }}
-                                    </div>
-                                    <div>
-                                        <div class="text-sm font-semibold text-gray-800">{{ $review->user_name }}</div>
-                                        <div class="text-[11px] text-gray-400">{{ \Carbon\Carbon::parse($review->created_at)->format('d F Y') }}</div>
-                                    </div>
-                                </div>
-                                <div class="flex text-yellow-400 text-sm mb-2">
-                                    @for($i=0; $i<$review->rating; $i++) <i class="fa-solid fa-star"></i> @endfor
-                                </div>
-                                <p class="text-sm text-gray-700">{{ $review->comment }}</p>
-                            </div>
-                        @empty
-                            <div class="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">C</div>
-                                    <div>
-                                        <div class="text-sm font-semibold text-gray-800">Clara S.</div>
-                                        <div class="text-[11px] text-gray-400">20 September 2025</div>
-                                    </div>
-                                </div>
-                                <div class="flex text-yellow-400 text-sm mb-2">
-                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                                </div>
-                                <p class="text-sm text-gray-700">Suka banget sama kalungnya! Desainnya cantik dan kelihatan mewah.</p>
-                            </div>
-                        @endforelse
-                    </div>
                 </div>
             </div>
 
-            <div class="hidden lg:block lg:col-span-3">
-                <div class="sticky-card bg-white p-6 card-shadow border border-gray-100">
-                    <h3 class="font-semibold text-gray-700 mb-2">Info Produk</h3>
-
-                    <div class="card-sub mb-1">Harga</div>
-                    <div class="product-price mb-4">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
-
-                    <!-- Removed: Terjual / Kondisi line as requested -->
-
-                    <div class="border-t border-gray-100 my-4"></div>
-
-                    <button id="open-review-form-desktop" class="w-full bg-primary text-white font-bold py-3 rounded-lg shadow hover:bg-[#ff6363] transition">Beri Ulasan</button>
-
-                    <div class="mt-4 text-xs text-gray-400 text-center">
-                        <i class="fa-solid fa-shield-halved mr-1"></i> Aman & Terpercaya
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm mb-8">
+                <h3 class="font-bold text-slate-900 text-base mb-5 flex items-center gap-2">
+                    <i class="fa-solid fa-store text-[#FF7A7A]"></i> Informasi Penjual
+                </h3>
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-[#FF7A7A] to-red-400 text-white flex items-center justify-center text-xl font-bold shadow-md flex-shrink-0">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold text-slate-900 flex items-center gap-2 mb-1">
+                            {{ $product->shop->name }}
+                            <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#FF7A7A]">
+                                <i class="fa-solid fa-circle-check text-white text-[10px]"></i>
+                            </span>
+                        </div>
+                        @if($product->seller && $product->seller->region)
+                            <div class="text-sm text-gray-600 flex items-center gap-1.5">
+                                <i class="fa-solid fa-location-dot text-xs text-[#FF7A7A]"></i> 
+                                <span>{{ $product->seller->region->name }}</span>
+                            </div>
+                        @elseif($product->seller && $product->seller->region_id)
+                            <div class="text-sm text-gray-500">Region ID: {{ $product->seller->region_id }} (Region belum di-load)</div>
+                        @else
+                            <div class="text-sm text-gray-500 italic">Lokasi tidak tersedia</div>
+                        @endif
                     </div>
                 </div>
             </div>
-
-        </div> <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex gap-3 lg:hidden z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-             <button id="open-review-form-mobile" class="w-full bg-white border border-primary text-primary font-bold py-2 rounded-lg text-sm hover:bg-red-50">
-                Beri Ulasan
-            </button>
         </div>
 
-        <div id="review-form-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-[fadeIn_0.2s_ease-out]">
-                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
-                    <h4 class="font-bold text-gray-800">Tulis Ulasan</h4>
-                    <button id="close-modal" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </main>
+
+    <section class="tokped-container mt-32 pt-20 border-t-2 border-gray-200">
+        <div class="mb-10">
+            <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-star text-yellow-400"></i> Ulasan Pengunjung
+            </h2>
+            <p class="text-gray-600 text-sm">Lihat apa yang dikatakan pelanggan tentang produk ini</p>
+        </div>
+        
+        @if(session('success'))
+            <div class="tokped-container mb-6">
+                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-2xl">{{ session('success') }}</div>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="tokped-container mb-6">
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl">{{ session('error') }}</div>
+            </div>
+        @endif
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+            
+            <div class="md:col-span-4 lg:col-span-4">
+                <div class="bg-gradient-to-br from-yellow-50 to-orange-50 p-8 rounded-3xl border border-yellow-200 shadow-sm sticky top-24">
+                    <div class="flex items-end gap-3 mb-5">
+                        <span class="text-6xl font-extrabold text-slate-900 leading-none">{{ number_format($avgRating, 1) }}</span>
+                        <div class="pb-1">
+                            <span class="text-gray-500 text-sm font-medium">/ 5</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-1 text-yellow-400 text-lg mb-3">
+                        @for($i=1; $i<=5; $i++) 
+                            <i class="{{ $i <= round($avgRating) ? 'fa-solid' : 'fa-regular' }} fa-star"></i> 
+                        @endfor
+                    </div>
+                    <div class="text-sm font-semibold text-slate-700 mb-8">
+                        <span class="text-[#FF5C5C]">{{ $totalReviews }}</span> ulasan dari pembeli
+                    </div>
+                    
+                    <div class="space-y-3 mb-8 bg-white/60 p-4 rounded-2xl">
+                        @for($i=5; $i>=1; $i--)
+                            @php $pct = $totalReviews > 0 ? ($starCounts[$i] / $totalReviews) * 100 : 0; @endphp
+                            <div class="flex items-center gap-3 text-xs">
+                                <span class="font-bold text-slate-600 w-4">{{ $i }}★</span>
+                                <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full" style="width: {{ $pct }}%"></div>
+                                </div>
+                                <span class="text-gray-500 w-6 text-right font-semibold">{{ $starCounts[$i] }}</span>
+                            </div>
+                        @endfor
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 mb-6">
+                        <p class="text-sm text-gray-600 mb-4 text-center font-medium">Punya pengalaman dengan produk ini?</p>
+                        <button id="open-review-form-desktop" class="w-full bg-gradient-to-r from-[#FF5C5C] to-red-400 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 shadow-md">
+                            <i class="fa-regular fa-pen-to-square text-lg"></i> Bagikan Ulasan Kamu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-8 lg:col-span-8">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                    <div class="font-bold text-slate-800">Ulasan Pilihan</div>
+                    <div class="text-sm text-gray-500">Menampilkan {{ $reviews->count() }} ulasan</div>
                 </div>
                 
-                <div class="p-6 max-h-[80vh] overflow-y-auto">
-                    <div class="mb-6 text-center">
-                        <label class="block text-sm font-semibold text-gray-600 mb-2">Bagaimana kualitas produk ini?</label>
-                        <div id="form-star-rating" class="flex justify-center text-gray-300 text-3xl gap-2 cursor-pointer">
-                            <i class="fa-solid fa-star form-star transition hover:text-yellow-400" data-value="1"></i>
-                            <i class="fa-solid fa-star form-star transition hover:text-yellow-400" data-value="2"></i>
-                            <i class="fa-solid fa-star form-star transition hover:text-yellow-400" data-value="3"></i>
-                            <i class="fa-solid fa-star form-star transition hover:text-yellow-400" data-value="4"></i>
-                            <i class="fa-solid fa-star form-star transition hover:text-yellow-400" data-value="5"></i>
-                        </div>
-                        <div id="rating-text" class="text-xs text-yellow-500 font-bold mt-2 h-4"></div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1">Nama</label>
-                                <input type="text" id="review-name" class="form-input w-full p-2.5 text-sm" placeholder="Nama Lengkap">
+                <div id="reviews-list" class="space-y-5">
+                    @forelse($reviews as $review)
+                        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-[#FF5C5C]/20 transition-all duration-300 group">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#FF5C5C] to-red-400 flex items-center justify-center text-sm font-bold text-white shadow-md">
+                                        {{ strtoupper(substr(trim($review->user_name ?? 'U'),0,1)) }}
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="font-bold text-sm text-slate-900">{{ $review->user_name ?? 'Pembeli' }}</div>
+                                        <div class="text-[11px] text-gray-500">{{ \Carbon\Carbon::parse($review->created_at)->diffForHumans() }}</div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-0.5 text-yellow-400 text-sm bg-yellow-50 px-2.5 py-1.5 rounded-lg border border-yellow-100 flex-shrink-0">
+                                    @for($i=0; $i<5; $i++)
+                                        @if($i < $review->rating)
+                                            <i class="fa-solid fa-star"></i>
+                                        @else
+                                            <i class="fa-regular fa-star"></i>
+                                        @endif
+                                    @endfor
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1">No. HP</label>
-                                <input type="tel" id="review-phone" class="form-input w-full p-2.5 text-sm" placeholder="0812...">
+                            <p class="text-sm text-gray-600 leading-relaxed pl-14">{{ $review->comment }}</p>
+                        </div>
+                    @empty
+                        <div class="flex flex-col items-center justify-center py-16 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center">
+                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm text-gray-300 text-2xl">
+                                <i class="fa-regular fa-comments"></i>
                             </div>
+                            <h4 class="font-bold text-slate-700">Belum ada ulasan</h4>
+                            <p class="text-sm text-gray-500 mt-1">Jadilah yang pertama memberikan ulasan untuk produk ini.</p>
                         </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Email</label>
-                            <input type="email" id="review-email" class="form-input w-full p-2.5 text-sm" placeholder="email@contoh.com">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Provinsi</label>
-                            <select id="review-provinsi" class="form-input w-full p-2.5 text-sm bg-white">
-                                <option value="">Pilih Provinsi...</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Ulasan Kamu</label>
-                            <textarea id="review-comment" rows="3" class="form-input w-full p-2.5 text-sm" placeholder="Ceritakan kepuasanmu tentang kualitas barang & pelayanan toko ini..."></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                    <button id="cancel-review" class="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-lg transition">Batal</button>
-                    <button id="submit-review" class="px-6 py-2 text-sm font-bold bg-primary text-white rounded-lg shadow hover:bg-red-500 transition">Kirim</button>
+                    @endforelse
                 </div>
             </div>
         </div>
+    </section>
 
-    </main>
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 lg:hidden z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+         <button id="open-review-form-mobile" class="w-full bg-[#FF7A7A] text-white font-bold py-3.5 rounded-xl text-sm hover:bg-[#ff6363] shadow-lg shadow-pink-200">
+            Tulis Ulasan
+        </button>
+    </div>
 
-    <x-footer />
+    <div id="review-form-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" id="close-modal-bg"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden animate-fade-up flex flex-col max-h-[90vh]">
+                
+                <div class="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                    <div>
+                        <h4 class="font-bold text-xl text-slate-900">Beri Ulasan</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">Bagikan pengalaman belanja kamu</p>
+                    </div>
+                    <button id="close-modal" class="w-9 h-9 rounded-full bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                
+                <form action="{{ route('ratings.store') }}" method="POST" class="p-8 overflow-y-auto custom-scroll space-y-6">
+                    @csrf
+                    <input type="hidden" name="product_detail_id" value="{{ $firstDetailId ?? ($product->productDetails->first()->id ?? '') }}">
+                    <div class="text-center bg-yellow-50/30 p-6 rounded-3xl border border-dashed border-yellow-200">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Rating Kamu</label>
+                        <div id="form-star-rating" class="flex justify-center text-4xl gap-3 cursor-pointer">
+                            <i class="fa-regular fa-star form-star text-gray-300 hover:text-yellow-400 transition transform hover:scale-110" data-value="1"></i>
+                            <i class="fa-regular fa-star form-star text-gray-300 hover:text-yellow-400 transition transform hover:scale-110" data-value="2"></i>
+                            <i class="fa-regular fa-star form-star text-gray-300 hover:text-yellow-400 transition transform hover:scale-110" data-value="3"></i>
+                            <i class="fa-regular fa-star form-star text-gray-300 hover:text-yellow-400 transition transform hover:scale-110" data-value="4"></i>
+                            <i class="fa-regular fa-star form-star text-gray-300 hover:text-yellow-400 transition transform hover:scale-110" data-value="5"></i>
+                        </div>
+                        <input type="hidden" name="rating" id="rating-value" value="">
+                        <div id="rating-text" class="text-sm font-bold text-[#FF7A7A] mt-3 h-5 tracking-wide uppercase"></div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="group">
+                            <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Nama Lengkap</label>
+                            <input type="text" id="review-name" name="name" class="form-input" placeholder="Contoh: Budi Santoso" required>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">No. HP</label>
+                                <input type="tel" id="review-phone" name="no_telp" class="form-input" placeholder="0812...">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Provinsi</label>
+                                <div class="relative">
+                                    <select id="review-provinsi" name="provinsi" class="form-input appearance-none text-gray-600">
+                                        <option value="">Pilih...</option>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-xs text-gray-400 pointer-events-none"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Email (Untuk Notifikasi)</label>
+                            <input type="email" id="review-email" name="email" class="form-input" placeholder="email@contoh.com" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Ulasan Kamu</label>
+                            <textarea id="review-comment" name="review" rows="3" class="form-input resize-none" placeholder="Ceritakan detail kualitas barang..."></textarea>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="p-6 border-t border-gray-100 bg-gray-50 flex gap-4">
+                    <button id="cancel-review" type="button" class="flex-1 py-3.5 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-2xl transition">Batal</button>
+                    <button id="submit-review" type="submit" class="flex-[2] py-3.5 text-sm font-bold bg-[#FF7A7A] hover:bg-[#ff6363] text-white rounded-2xl shadow-lg shadow-pink-200 hover:shadow-pink-300 transition transform active:scale-[0.98]">Kirim Ulasan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Helpers
             const qs = (sel) => document.querySelector(sel);
             const qsa = (sel) => document.querySelectorAll(sel);
 
-            // 1. Modal Handling
             const modal = qs('#review-form-modal');
             const openBtns = [qs('#open-review-form-desktop'), qs('#open-review-form-mobile')];
             const closeBtn = qs('#close-modal');
+            const closeBg = qs('#close-modal-bg');
             const cancelBtn = qs('#cancel-review');
 
             function toggleModal(show) {
-                if(show) modal.classList.remove('hidden');
-                else modal.classList.add('hidden');
+                if(show) {
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
             }
 
-            openBtns.forEach(btn => {
-                if(btn) btn.addEventListener('click', () => toggleModal(true));
-            });
-            
-            [closeBtn, cancelBtn].forEach(btn => {
-                if(btn) btn.addEventListener('click', () => toggleModal(false));
-            });
+            openBtns.forEach(btn => { if(btn) btn.addEventListener('click', () => toggleModal(true)); });
+            [closeBtn, cancelBtn, closeBg].forEach(btn => { if(btn) btn.addEventListener('click', () => toggleModal(false)); });
 
-            // Close on click outside
-            modal.addEventListener('click', (e) => {
-                if(e.target === modal) toggleModal(false);
-            });
-
-
-            // 2. Fetch Provinces
             const provSelect = qs('#review-provinsi');
             if (provSelect) {
                 fetch('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json')
-                    .then(r => r.json())
-                    .then(list => {
+                    .then(r => r.json()).then(list => {
                         list.forEach(p => {
                             const opt = document.createElement('option'); opt.value = p.name; opt.textContent = p.name; provSelect.appendChild(opt);
                         });
                     }).catch(()=>{});
             }
 
-
-            // 3. Form Star Logic
             let formSelected = 0;
             const formStars = qsa('.form-star');
             const ratingText = qs('#rating-text');
+            const ratingInput = qs('#rating-value');
             const ratingLabels = ["Sangat Buruk", "Buruk", "Cukup", "Bagus", "Sangat Bagus"];
 
             function setFormStars(n) {
                 formStars.forEach(s => {
                     const v = parseInt(s.dataset.value);
                     if (v <= n) {
-                        s.classList.remove('text-gray-300');
-                        s.classList.add('text-yellow-400');
+                        s.classList.remove('fa-regular', 'text-gray-300');
+                        s.classList.add('fa-solid', 'text-yellow-400');
                     } else {
-                        s.classList.add('text-gray-300');
-                        s.classList.remove('text-yellow-400');
+                        s.classList.add('fa-regular', 'text-gray-300');
+                        s.classList.remove('fa-solid', 'text-yellow-400');
                     }
                 });
                 if(n > 0) ratingText.textContent = ratingLabels[n-1];
+                if(ratingInput) ratingInput.value = n || '';
             }
 
             formStars.forEach(s => {
@@ -392,70 +422,76 @@
                 });
             });
 
-
-            // 4. Local Storage Review Logic
+            // LocalStorage Logic
             const storageKey = 'cm_reviews_product_{{ $product->id }}';
-            const serverCount = {{ $reviews->count() }};
-            const serverSum = {{ $reviews->count() > 0 ? $reviews->sum('rating') : 0 }};
-            
+            const reviewsList = qs('#reviews-list');
             let storedReviews = [];
             try { storedReviews = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) { storedReviews = []; }
 
-            let totalReviewCount = storedReviews.length; 
-            let currentTotalCount = serverCount + totalReviewCount;
-            
-            // Render Stored Reviews
-            const reviewsList = qs('#reviews-list');
-            
             if (reviewsList && storedReviews.length) {
-                storedReviews.slice().reverse().forEach(r => {
-                    const starHtml = Array.from({length: r.rating}).map(() => '<i class="fa-solid fa-star"></i>').join('');
-                    const initials = (r.name || '').trim().split(' ').map(p=>p[0]||'').join('').slice(0,2).toUpperCase();
-                    
-                    const html = `
-                        <div class="border-b border-gray-100 pb-4 last:border-0 bg-yellow-50 p-3 rounded-lg mb-4">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold">
+                storedReviews.slice().reverse().forEach(r => renderReview(r));
+            }
+
+            function renderReview(r) {
+                const starHtml = Array.from({length: r.rating}).map(() => '<i class="fa-solid fa-star"></i>').join('');
+                const initials = (r.name || '').trim().split(' ').map(p=>p[0]||'').join('').slice(0,2).toUpperCase();
+                
+                const html = `
+                    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 mb-6 animate-fade-up">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-xs font-bold text-slate-600 shadow-inner">
                                     ${escapeHtml(initials)}
                                 </div>
-                                <div class="text-xs font-bold text-gray-800">${escapeHtml(r.name)} <span class="font-normal text-gray-400">• Baru saja</span></div>
+                                <div>
+                                    <div class="font-bold text-sm text-slate-900">${escapeHtml(r.name)}</div>
+                                    <div class="text-[10px] text-gray-400">Baru saja</div>
+                                </div>
                             </div>
-                            <div class="flex text-yellow-400 text-[10px] mb-2">${starHtml}</div>
-                            <p class="text-sm text-gray-700">${escapeHtml(r.comment || '-')}</p>
+                            <div class="flex text-yellow-400 text-xs bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">
+                                ${starHtml}
+                            </div>
                         </div>
-                    `;
-                    reviewsList.insertAdjacentHTML('afterbegin', html);
+                        <p class="text-sm text-gray-600 leading-relaxed pl-14">${escapeHtml(r.comment || '-')}</p>
+                    </div>
+                `;
+                reviewsList.insertAdjacentHTML('afterbegin', html);
+            }
+
+            const submitReviewBtn = qs('#submit-review');
+            const formEl = modal.querySelector('form');
+            if (formEl && submitReviewBtn) {
+                formEl.addEventListener('submit', (e) => {
+                    if (!ratingInput.value) {
+                        e.preventDefault();
+                        alert('Mohon pilih bintang rating terlebih dahulu');
+                        return false;
+                    }
+                    toggleModal(false);
                 });
             }
 
-            if(storedReviews.length > 0) {
-                 const avgCountEl = qs('#avg-count');
-                 if(avgCountEl) avgCountEl.textContent = `(${currentTotalCount} rating)`;
+            function showEmailNotification(email, name) {
+                const notifArea = document.getElementById('notification-area');
+                const toast = document.createElement('div');
+                toast.className = "bg-white border-l-4 border-blue-500 p-4 rounded-xl shadow-2xl email-toast flex gap-4 w-96 pointer-events-auto ring-1 ring-black/5";
+                toast.innerHTML = `
+                    <div class="flex-shrink-0 w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-envelope-circle-check text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Sistem Email (Simulasi)</p>
+                        <p class="text-sm font-bold text-slate-800 truncate">To: ${escapeHtml(email)}</p>
+                        <p class="text-xs text-slate-500 mt-1 line-clamp-2">"Hai ${escapeHtml(name)}, Terima kasih telah memberikan ulasan..."</p>
+                    </div>
+                `;
+                notifArea.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => toast.remove(), 500);
+                }, 6000);
             }
-
-            // Submit Handler
-            const submitReviewBtn = qs('#submit-review');
-            submitReviewBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const name = qs('#review-name').value.trim();
-                const phone = qs('#review-phone').value.trim();
-                const prov = qs('#review-provinsi').value.trim();
-                const email = qs('#review-email').value.trim();
-                const comment = qs('#review-comment').value.trim();
-                const rating = formSelected;
-
-                if (!name || !phone || !prov || !email || !rating) {
-                    alert('Mohon lengkapi data dan pilih bintang!');
-                    return;
-                }
-
-                const reviewObj = { name, phone, provinsi: prov, email, comment, rating, created_at: new Date().toISOString() };
-                storedReviews.push(reviewObj);
-                localStorage.setItem(storageKey, JSON.stringify(storedReviews));
-
-                alert('Ulasan berhasil disimpan!');
-                location.reload(); 
-            });
 
             function escapeHtml(unsafe) {
                 return String(unsafe).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -464,16 +500,17 @@
     </script>
 
     <script>
-        // Navbar shadow on scroll (match home behavior)
         (function(){
             const navbar = document.getElementById('navbar');
             if(!navbar) return;
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 10) navbar.classList.add('shadow-md');
-                else navbar.classList.remove('shadow-md');
+                if (window.scrollY > 10) navbar.classList.add('shadow-sm');
+                else navbar.classList.remove('shadow-sm');
             });
         })();
     </script>
+
+    <x-footer />
 
 </body>
 </html>

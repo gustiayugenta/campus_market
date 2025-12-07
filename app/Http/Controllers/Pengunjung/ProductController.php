@@ -23,7 +23,7 @@ class ProductController extends Controller
     public function show(Request $request, $id)
     {
         try {
-            $product = Product::with(['seller', 'category', 'productDetails'])->findOrFail($id);
+            $product = Product::with(['seller.user', 'seller.region', 'category', 'productDetails'])->findOrFail($id);
     
             // >>> tambahkan blok ini <<<
             $img = $product->image;
@@ -45,11 +45,17 @@ class ProductController extends Controller
             $product->image_url = $imageUrl;
             // >>> sampai sini <<<
     
-            // description, shop, relatedProducts, reviews ... (kode kamu yang lama)
+            // description from first product detail or product field
             $firstDetail = $product->productDetails->first();
+            $firstDetailId = $firstDetail->id ?? null;
             $product->description = $firstDetail->description ?? ($product->description ?? null);
-    
-            $product->shop = (object) ['name' => $product->seller->shop_name ?? ($product->seller->user->name ?? 'Toko')];
+
+            // shop display name derived from seller
+            $product->shop = (object) [
+                'name' => $product->seller->shop_name 
+                    ?? optional($product->seller->user)->name 
+                    ?? 'Toko'
+            ];
     
             $relatedProducts = Product::where('category_id', $product->category_id)
                 ->where('id', '!=', $product->id)
@@ -57,19 +63,29 @@ class ProductController extends Controller
                 ->get();
     
             $detailIds = $product->productDetails->pluck('id')->all();
-            $reviews = Rating::whereIn('product_detail_id', $detailIds)
+            $rawReviews = Rating::whereIn('product_detail_id', $detailIds)
                 ->orderByDesc('created_at')
-                ->get()
-                ->map(function ($r) {
-                    return (object) [
-                        'user_name' => $r->name ?? 'Pembeli',
-                        'rating'    => $r->rating,
-                        'comment'   => $r->review,
-                        'created_at'=> $r->created_at,
-                    ];
-                });
-    
-            return view('pengunjung.detailproduk', compact('product', 'relatedProducts', 'reviews'));
+                ->get();
+
+            $reviews = $rawReviews->map(function ($r) {
+                return (object) [
+                    'user_name' => $r->name ?? 'Pembeli',
+                    'rating'    => $r->rating,
+                    'comment'   => $r->review,
+                    'created_at'=> $r->created_at,
+                ];
+            });
+
+            // compute rating stats server-side
+            $avgRating = $rawReviews->count() ? round($rawReviews->avg('rating'), 1) : 0;
+            $totalReviews = $rawReviews->count();
+            $starCounts = [1=>0,2=>0,3=>0,4=>0,5=>0];
+            foreach ($rawReviews as $r) {
+                $val = (int) $r->rating;
+                if (isset($starCounts[$val])) $starCounts[$val]++;
+            }
+
+            return view('pengunjung.detailproduk', compact('product', 'relatedProducts', 'reviews', 'avgRating', 'totalReviews', 'starCounts', 'firstDetailId'));
         } catch (ModelNotFoundException $e) {
             abort(404);
         }
