@@ -12,7 +12,6 @@ Route::get('/dashboard-seller/cetaklaporan', [\App\Http\Controllers\Seller\Repor
     ->name('seller.cetaklaporan')
     ->middleware('auth');
 
-
 // Route ke halaman Home Pengunjung (via controller)
 Route::get('/', [HomeController::class, 'index']);
 
@@ -25,21 +24,13 @@ Route::get('/detailproduk/{id}', [ProductController::class, 'show'])->name('prod
 // Ratings: submit review (one per product per email)
 Route::post('/ratings', [RatingController::class, 'store'])->name('ratings.store');
 
-// Route ke halaman Home Pengunjung
-Route::get('/detailproduk', function () {
-    // Artinya: Buka file "home" yang ada di dalam folder "pengunjung"
-    return view('pengunjung.detailproduk');
-});
-
 Route::get('/login-seller', [AuthController::class, 'showLogin']);
 
 // Login / Logout
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-
 Route::get('/register-seller', function () {
-    // Artinya: Buka file "register" yang ada di dalam folder "pengunjung"
     return view('pengunjung.register');
 });
 
@@ -52,29 +43,35 @@ Route::get('/dashboard-seller/statistics', [DashboardController::class, 'statist
     ->name('seller.statistics')
     ->middleware('auth');
 
-Route::get('/dashboard-seller/produk', [\App\Http\Controllers\Seller\ProductController::class, 'index'])
+Route::get('/dashboard-seller/produk', [ProductController::class, 'index'])
     ->name('seller.produk')
     ->middleware('auth');
+
 // Halaman tambah produk (form)
-Route::get('/dashboard-seller/tambahproduk', [\App\Http\Controllers\Seller\ProductController::class, 'create'])
+Route::get('/dashboard-seller/tambahproduk', [ProductController::class, 'create'])
     ->name('seller.tambahproduk')
     ->middleware('auth');
+
 // Simpan produk baru
-Route::post('/dashboard-seller/produk', [\App\Http\Controllers\Seller\ProductController::class, 'store'])
+Route::post('/dashboard-seller/produk', [ProductController::class, 'store'])
     ->name('seller.produk.store')
     ->middleware('auth');
+
 // Hapus produk
 Route::delete('/dashboard-seller/produk/{id}', [\App\Http\Controllers\Seller\ProductController::class, 'destroy'])
     ->name('seller.produk.destroy')
     ->middleware('auth');
+
 // Toggle aktif/nonaktif produk (POST)
 Route::post('/dashboard-seller/produk/{id}/toggle', [\App\Http\Controllers\Seller\ProductController::class, 'toggleActive'])
     ->name('seller.produk.toggle')
     ->middleware('auth');
+
 // Edit produk (form)
 Route::get('/dashboard-seller/produk/{id}/edit', [\App\Http\Controllers\Seller\ProductController::class, 'edit'])
     ->name('seller.produk.edit')
     ->middleware('auth');
+
 // Update produk
 Route::put('/dashboard-seller/produk/{id}', [\App\Http\Controllers\Seller\ProductController::class, 'update'])
     ->name('seller.produk.update')
@@ -85,33 +82,25 @@ Route::post('/dashboard-seller/toggle-account', [DashboardController::class, 'to
     ->name('seller.toggle-account')
     ->middleware('auth');
 
-// (route defined earlier using ReportController)
-
-// Admin Dashboard
-Route::get('/dashboard-admin', function () {
-    return view('admin.dashboard');
-});
+// Admin Dashboard - UPDATED TO USE CONTROLLER
+Route::get('/dashboard-admin', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
+    ->name('admin.dashboard')
+    ->middleware('auth');
 
 Route::get('/dashboard-admin/verifikasi', function () {
     return view('admin.verifikasi.verifikasi');
-});
+})->middleware('auth');
 
 Route::get('/dashboard-admin/detailverifikasi', function () {
     return view('admin.verifikasi.detailverifikasi');
-});
+})->middleware('auth');
 
 Route::get('/dashboard-admin/seller-data', function () {
     return view('admin.penjual.seller_data');
-});
+})->middleware('auth');
 
 Route::get('/dashboard-admin/reports', function () {
     return view('admin.laporan.laporan');
-});
-
-// Demo product detail (frontend-only) - no DB required
-Route::get('/detailproduk/demo', function () {
-    return view('pengunjung.detailproduk', compact('product', 'relatedProducts', 'reviews'));
-});
-// End of routes
+})->middleware('auth');
 
 require __DIR__.'/debug_ratings.php';

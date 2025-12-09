@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::table('rating_reviews', function (Blueprint $table) {
             // Drop existing unique index on email if it exists
-            $table->dropUnique(['email']);
+            // $table->dropUnique(['email']);
             // Add composite unique (product_detail_id, email)
             $table->unique(['product_detail_id', 'email'], 'rating_unique_per_product_email');
         });
@@ -19,7 +19,7 @@ return new class extends Migration {
     {
         Schema::table('rating_reviews', function (Blueprint $table) {
             $table->dropUnique('rating_unique_per_product_email');
-            $table->unique('email');
+            // $table->unique('email');
         });
     }
 };

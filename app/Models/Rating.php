@@ -22,4 +22,9 @@ class Rating extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'region_id');
+    }
 }
