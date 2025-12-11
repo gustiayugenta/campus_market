@@ -20,9 +20,9 @@
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zM9 11h6"></path></svg>
             Cetak Laporan
         </a>
-        <a href="{{ route('logout') }}"
+        <a href="#"
            class="flex items-center px-4 py-3 rounded-xl shadow-md transition-colors text-gray-600 hover:bg-red-50 hover:text-red-500"
-           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+           onclick="event.preventDefault(); document.getElementById('logout-modal').classList.remove('hidden');">
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             Logout
         </a>
@@ -32,3 +32,23 @@
 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
     @csrf
 </form>
+
+<!-- Modal Logout -->
+<div id="logout-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30 hidden">
+    <div class="bg-white rounded-xl shadow-lg p-0 w-full max-w-md text-center">
+        <div class="flex flex-col items-center pt-8 pb-2">
+            <span class="inline-block bg-red-100 rounded-full p-3 mb-2">
+                <svg class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" fill="#FEE2E2"/>
+                    <path d="M12 8v4" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="12" cy="16" r="1" fill="#EF4444"/>
+                </svg>
+            </span>
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Apakah Anda yakin ingin keluar?</h3>
+        </div>
+        <div class="flex justify-center gap-4 px-8 pb-8">
+            <button onclick="document.getElementById('logout-modal').classList.add('hidden');" class="flex-1 py-3 rounded-lg bg-gray-100 text-gray-600 font-semibold text-lg">Batal</button>
+            <button onclick="document.getElementById('logout-form').submit();" class="flex-1 py-3 rounded-lg bg-red-500 text-white font-semibold text-lg">Ya, Keluar</button>
+        </div>
+    </div>
+</div>
