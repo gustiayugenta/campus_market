@@ -17,7 +17,7 @@
 
     <div class="flex h-screen overflow-hidden">
 
-        @include('admin._sidebar', ['active' => 'dashboard', 'verifCount' => 3])
+        @include('admin._sidebar', ['active' => 'dashboard'])
 
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-red-50 p-6 md:p-8">
             
