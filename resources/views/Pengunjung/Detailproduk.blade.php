@@ -55,6 +55,21 @@
             @apply w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-[#FF7A7A] transition-colors placeholder-gray-400;
         }
     </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            500: '#FF9894',
+                            600: '#FF7A7A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="pb-24 relative">
 
@@ -176,9 +191,10 @@
 
         </main>
 
-    <section class="tokped-container mt-32 pt-20 border-t-2 border-gray-200">
-        <div class="mb-10">
-            <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2 mb-2">
+    <section class="tokped-container mt-32 pt-20">
+        <div class="mt-10 border-t-2 border-gray-200">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2 mb-2 mt-8">
                 <i class="fa-solid fa-star text-yellow-400"></i> Ulasan Pengunjung
             </h2>
             <p class="text-gray-600 text-sm">Lihat apa yang dikatakan pelanggan tentang produk ini</p>
@@ -186,12 +202,12 @@
         
         @if(session('success'))
             <div class="tokped-container mb-6">
-                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-2xl">{{ session('success') }}</div>
+                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-2xl mb-7">{{ session('success') }}</div>
             </div>
         @endif
         @if(session('error'))
             <div class="tokped-container mb-6">
-                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl">{{ session('error') }}</div>
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl mb-7">{{ session('error') }}</div>
             </div>
         @endif
 
