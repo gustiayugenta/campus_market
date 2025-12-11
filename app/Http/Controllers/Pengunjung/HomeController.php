@@ -23,7 +23,7 @@ class HomeController extends Controller
             $perPage = 12;
             $page = max(1, (int) $request->query('page', 1));
 
-            $productsQuery = Product::with(['seller', 'ratings']);
+            $productsQuery = Product::active()->with(['seller', 'ratings']);
 
             if (!empty($q)) {
                 $productsQuery = $productsQuery->where(function ($w) use ($q) {

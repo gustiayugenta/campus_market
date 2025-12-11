@@ -38,4 +38,10 @@ class Product extends Model
     {
         return $this->hasMany(Rating::class, 'product_detail_id');
     }
+
+    // Query scope: only active products
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

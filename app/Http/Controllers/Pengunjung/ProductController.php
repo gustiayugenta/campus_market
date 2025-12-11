@@ -39,7 +39,7 @@ class ProductController extends Controller
     public function show(Request $request, $id)
     {
         try {
-            $product = Product::with(['seller.user', 'seller.region', 'category', 'productDetails'])->findOrFail($id);
+            $product = Product::active()->with(['seller.user', 'seller.region', 'category', 'productDetails'])->findOrFail($id);
 
             $img = $product->image;
             if ($img) {
@@ -111,7 +111,7 @@ class ProductController extends Controller
         try {
             $perPage = 12;
 
-            $productsQuery = Product::with(['seller', 'seller.region', 'ratings', 'category']);
+            $productsQuery = Product::active()->with(['seller', 'seller.region', 'ratings', 'category']);
 
             if (!empty($q)) {
                 $productsQuery = $productsQuery->where(function ($w) use ($q) {
