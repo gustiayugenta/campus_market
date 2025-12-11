@@ -71,7 +71,7 @@
         }
     </script>
 </head>
-<body class="pb-24 relative">
+<body class="min-h-screen flex flex-col">
 
     <div id="notification-area" class="fixed top-24 right-5 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 

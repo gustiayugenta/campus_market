@@ -26,7 +26,7 @@
         @media (min-width:768px){ .tokped-container{ padding-left:1.5rem; padding-right:1.5rem }}
     </style>
 </head>
-<body class="bg-gray-50 text-slate-800 font-sans antialiased pb-20">
+<body class="bg-gray-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
     {{-- NAVBAR (copied from home) --}}
     <x-navbar />
