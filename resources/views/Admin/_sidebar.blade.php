@@ -3,7 +3,7 @@
     $verifCount = $verifCount ?? null;
 @endphp
 
-<aside class="w-64 bg-white hidden md:flex flex-col border-r border-red-100 z-10 flex-shrink-0 text-base">
+<aside class="w-64 bg-white hidden md:flex flex-col border-r border-red-100 z-10 flex-shrink-0 text-base h-screen">
     <div class="p-6">
         <h1 class="text-2xl font-bold text-red-500">SiToko</h1>
     </div>

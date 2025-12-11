@@ -79,7 +79,7 @@
 
 			<!-- SRS-MartPlace-09 -->
 			<section>
-				<h3 class="text-xl font-semibold text-gray-800 mb-4">(SRS-MartPlace-09) Daftar Akun Penjual Berdasarkan Status</h3>
+				<h3 class="text-xl font-semibold text-gray-800 mb-4">Daftar Akun Penjual Berdasarkan Status</h3>
 				<p class="text-sm text-gray-600 mb-4">Diurutkan: Aktif terlebih dahulu lalu Tidak Aktif.</p>
 				<table class="min-w-full divide-y divide-gray-200">
 					<thead class="table-header-light">
@@ -118,15 +118,15 @@
 
 			<!-- SRS-MartPlace-10 -->
 			<section>
-				<h3 class="text-xl font-semibold text-gray-800 mb-4">(SRS-MartPlace-10) Daftar Toko Berdasarkan Propinsi</h3>
-				<p class="text-sm text-gray-600 mb-4">Diurutkan berdasarkan nama propinsi.</p>
+				<h3 class="text-xl font-semibold text-gray-800 mb-4">Daftar Toko Berdasarkan Provinsi</h3>
+				<p class="text-sm text-gray-600 mb-4">Diurutkan berdasarkan nama provinsi.</p>
 				<table class="min-w-full divide-y divide-gray-200">
 					<thead class="table-header-light">
 						<tr class="bg-red-50/50">
 							<th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase">No.</th>
 							<th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase">Nama Toko</th>
 							<th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase">Nama PIC</th>
-							<th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase">Propinsi</th>
+							<th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase">Provinsi</th>
 						</tr>
 					</thead>
 					<tbody class="bg-white divide-y divide-gray-100">
@@ -155,8 +155,8 @@
 
 			<!-- SRS-MartPlace-11 -->
 			<section class="page-break">
-				<h3 class="text-xl font-semibold text-red-600 mb-4">(SRS-MartPlace-11) Daftar Produk Berdasarkan Rating</h3>
-				<p class="text-sm text-red-600 mb-4 font-medium">Propinsi adalah propinsi pemberi rating. Diurutkan rating tertinggi.</p>
+				<h3 class="text-xl font-semibold text-red-600 mb-4">Daftar Produk Berdasarkan Rating</h3>
+				<p class="text-sm text-red-600 mb-4 font-medium">Provinsi adalah provinsi pemberi rating. Diurutkan rating tertinggi.</p>
 				<table class="min-w-full divide-y divide-gray-200">
 					<thead class="table-header-critical">
 						<tr class="color-reorder-header">
@@ -166,7 +166,7 @@
 							<th class="px-4 py-2 text-right text-xs font-medium uppercase">Harga</th>
 							<th class="px-4 py-2 text-center text-xs font-medium uppercase">Rating</th>
 							<th class="px-4 py-2 text-left text-xs font-medium uppercase">Nama Toko</th>
-							<th class="px-4 py-2 text-left text-xs font-medium uppercase">Propinsi</th>
+							<th class="px-4 py-2 text-left text-xs font-medium uppercase">Provinsi</th>
 						</tr>
 					</thead>
 					<tbody class="bg-white divide-y divide-gray-100">
