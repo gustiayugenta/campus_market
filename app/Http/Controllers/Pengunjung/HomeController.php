@@ -44,7 +44,8 @@ class HomeController extends Controller
 
             // Transform each product into a view-friendly array
             $productsPaginated->getCollection()->transform(function ($p) {
-                $avg = $p->ratings->count() ? round($p->ratings->avg('rating'), 1) : 4.8;
+                // Default to 0.0 when no ratings exist
+                $avg = $p->ratings->count() ? round($p->ratings->avg('rating'), 1) : 0.0;
                 return [
                     'id' => $p->id,
                     'url' => route('products.show', $p->id),
